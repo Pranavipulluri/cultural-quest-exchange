@@ -170,7 +170,7 @@ const Exploration = () => {
                           </div>
                         </div>
                         <div className="mt-3 flex justify-end">
-                          <Button size="sm" className="bg-red-600 hover:bg-red-700">
+                          <Button size="sm" className="bg-red-600 hover:bg-red-700" onClick={() => setShowItinerary(true)}>
                             Play Now
                           </Button>
                         </div>

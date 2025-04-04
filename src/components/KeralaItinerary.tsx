@@ -101,8 +101,9 @@ const miniGames = [
     name: "Onam Boat Race",
     x: 650,
     y: 620,
-    description: "Race traditional boats through the Kerala backwaters during Onam festival.",
-    highlighted: true
+    description: "Race traditional boats through the Kerala backwaters during the Onam festival.",
+    featured: true,
+    icon: <Waves className="h-5 w-5" />
   }
 ];
 
@@ -129,14 +130,14 @@ const KeralaItinerary = () => {
   const [boatRaceState, setBoatRaceState] = useState({
     started: false,
     playerPosition: 0,
-    cpuPositions: [0, 0, 0], // 3 CPU boats
+    cpuPositions: [0, 0, 0],
     countdown: 3,
     finished: false,
     winner: '',
     obstacles: [] as {position: number, lane: number}[],
     crashedObstacle: false,
     playerSpeed: 0,
-    playerLane: 1, // 0, 1, or 2 (top, middle, bottom)
+    playerLane: 1,
     maxSpeed: 5,
     currentPathIndex: 0
   });
@@ -248,7 +249,6 @@ const KeralaItinerary = () => {
       setActiveGame(foundGame);
       setActiveLandmark(null);
 
-      // Direct to boat race game immediately if it's the Onam boat race
       if (foundGame.id === 5) {
         startGame();
       }
@@ -371,7 +371,6 @@ const KeralaItinerary = () => {
       setActiveGame(boatRaceGame);
       setActiveLandmark(null);
       
-      // Start the game immediately
       startGame();
     }
   };
@@ -381,6 +380,7 @@ const KeralaItinerary = () => {
       if (activeGame.id === 5) {
         setShowNpcDialog(true);
         setDialogStep(0);
+        setPlayingGame(true);
       } else {
         setPlayingGame(true);
         toast.success(`Starting ${activeGame.name}!`);
@@ -588,6 +588,9 @@ const KeralaItinerary = () => {
     if (!activeGame) return null;
     
     if (activeGame.id === 5) {
+      if (showNpcDialog) {
+        return renderNpcDialog();
+      }
       return renderBoatRace();
     } else if (activeGame.id === 1) {
       return (
@@ -1109,11 +1112,7 @@ const KeralaItinerary = () => {
       {/* Instruction Overlay */}
       {showInstructions && (
         <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-40">
-          <motion.div 
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-amber-900/90 p-6 rounded-lg max-w-md text-amber-100 border border-amber-600/50"
-          >
+          <div className="bg-slate-800 p-6 rounded-lg max-w-md text-amber-100 border border-amber-600/50">
             <h2 className="text-2xl font-bold mb-4 text-amber-200">Kerala Map Explorer</h2>
             <div className="space-y-4 mb-6">
               <p>Welcome to the traditional map of Kerala! Explore this ancient land and discover its wonders.</p>
@@ -1136,7 +1135,7 @@ const KeralaItinerary = () => {
             >
               Start Exploring
             </Button>
-          </motion.div>
+          </div>
         </div>
       )}
     </div>
