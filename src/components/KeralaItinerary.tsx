@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, TreePalm, Image, Gamepad, Waves, ChevronLeft, ChevronRight, Flag } from "lucide-react";
@@ -680,7 +681,7 @@ const KeralaItinerary = () => {
               {/* Water background animation */}
               <div className="absolute inset-0 flex">
                 {Array(20).fill(0).map((_, i) => (
-                  <div 
+                  <motion.div 
                     key={i}
                     className="h-1 bg-blue-400/20 rounded-full"
                     style={{ width: `${100/20}%` }}
@@ -774,3 +775,283 @@ const KeralaItinerary = () => {
                     
                     {/* CPU Boat interior */}
                     <div className={`absolute h-2 w-12 bg-gradient-to-b ${
+                      idx === 0 
+                      ? "from-blue-600 to-blue-800" 
+                      : idx === 1 
+                        ? "from-green-600 to-green-800" 
+                        : "from-purple-600 to-purple-800"
+                    } rounded-lg top-1 left-2 transform -skew-x-12`} />
+                    
+                    {/* CPU Rowers */}
+                    <div className="absolute top-0 left-3 w-8 flex justify-around">
+                      <motion.div 
+                        className="h-2 w-1 bg-red-600"
+                        animate={{ rotate: [0, 20, 0, -20, 0] }}
+                        transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.1 }}
+                      />
+                      <motion.div 
+                        className="h-2 w-1 bg-red-600"
+                        animate={{ rotate: [0, -20, 0, 20, 0] }}
+                        transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.1 + 0.1 }}
+                      />
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+
+              {/* Obstacles */}
+              {boatRaceState.obstacles.map((obstacle, idx) => (
+                <div 
+                  key={`obstacle-${idx}`}
+                  className="absolute h-4 w-4 bg-red-500 rounded-full"
+                  style={{ 
+                    left: `${obstacle.position}%`, 
+                    top: `${obstacle.lane * 33 + 16}%`,
+                  }}
+                />
+              ))}
+            </div>
+            
+            {/* Race Controls */}
+            <div className="flex flex-col gap-4">
+              <div className="grid grid-cols-3 gap-2">
+                <div className="col-span-3 text-center text-white text-sm">
+                  {boatRaceState.crashedObstacle ? (
+                    <span className="text-red-400">You crashed!</span>
+                  ) : boatRaceState.finished ? (
+                    <span className={boatRaceState.winner === 'player' ? "text-green-400" : "text-blue-400"}>
+                      {boatRaceState.winner === 'player' ? "You won!" : "A competitor won!"}
+                    </span>
+                  ) : (
+                    <span>
+                      Speed: <span className="text-yellow-400">{Math.round(boatRaceState.playerSpeed * 20)}%</span>
+                    </span>
+                  )}
+                </div>
+                
+                <Button 
+                  onClick={() => changeBoatLane(0)}
+                  disabled={boatRaceState.playerLane === 0 || boatRaceState.finished}
+                  className={`py-1 ${boatRaceState.playerLane === 0 ? "bg-teal-700" : "bg-teal-600 hover:bg-teal-500"}`}
+                >
+                  Top Lane
+                </Button>
+                <Button 
+                  onClick={() => changeBoatLane(1)}
+                  disabled={boatRaceState.playerLane === 1 || boatRaceState.finished}
+                  className={`py-1 ${boatRaceState.playerLane === 1 ? "bg-teal-700" : "bg-teal-600 hover:bg-teal-500"}`}
+                >
+                  Middle Lane
+                </Button>
+                <Button 
+                  onClick={() => changeBoatLane(2)}
+                  disabled={boatRaceState.playerLane === 2 || boatRaceState.finished}
+                  className={`py-1 ${boatRaceState.playerLane === 2 ? "bg-teal-700" : "bg-teal-600 hover:bg-teal-500"}`}
+                >
+                  Bottom Lane
+                </Button>
+              </div>
+              
+              <Button 
+                onClick={increaseBoatSpeed}
+                disabled={boatRaceState.finished}
+                className="bg-yellow-600 hover:bg-yellow-500 active:bg-yellow-700 text-white py-2"
+              >
+                PADDLE!
+              </Button>
+              
+              {boatRaceState.finished && (
+                <Button 
+                  onClick={resetBoatRace}
+                  className="mt-2 bg-blue-600 hover:bg-blue-500"
+                >
+                  Try Again
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div 
+      className="relative w-full h-screen overflow-hidden bg-gradient-to-br from-green-900 to-teal-800"
+      onWheel={handleZoom}
+    >
+      {/* Map container */}
+      <div 
+        ref={mapContainerRef}
+        className="relative w-full h-full overflow-hidden"
+        onMouseDown={handleMapDragStart}
+        onMouseMove={handleMapDragMove}
+        onMouseUp={handleMapDragEnd}
+        onMouseLeave={handleMapDragEnd}
+        onTouchStart={handleMapDragStart}
+        onTouchMove={handleMapDragMove}
+        onTouchEnd={handleMapDragEnd}
+      >
+        {/* Map */}
+        <div 
+          ref={mapRef}
+          className="absolute transform-origin-top-left"
+          style={{
+            width: `${MAP_WIDTH}px`,
+            height: `${MAP_HEIGHT}px`,
+            transform: `translate(${mapPosition.x}px, ${mapPosition.y}px) scale(${mapScale})`,
+          }}
+        >
+          {/* Render landmarks */}
+          {landmarks.map(landmark => (
+            <div
+              key={landmark.id}
+              className="absolute cursor-pointer transition-transform hover:scale-110"
+              style={{
+                left: landmark.x - CHARACTER_SIZE / 2,
+                top: landmark.y - CHARACTER_SIZE / 2,
+                width: CHARACTER_SIZE,
+                height: CHARACTER_SIZE,
+              }}
+              onClick={() => navigateToLandmark(landmark)}
+            >
+              <div className="absolute inset-0 bg-yellow-500 rounded-full opacity-30 animate-ping" />
+              <div className="absolute inset-0 flex items-center justify-center bg-yellow-500 rounded-full text-white text-xs font-bold">
+                <MapPin className="w-5 h-5" />
+              </div>
+            </div>
+          ))}
+          
+          {/* Render mini games */}
+          {miniGames.map(game => (
+            <div
+              key={game.id}
+              className="absolute cursor-pointer transition-transform hover:scale-110"
+              style={{
+                left: game.x - CHARACTER_SIZE / 2,
+                top: game.y - CHARACTER_SIZE / 2,
+                width: CHARACTER_SIZE,
+                height: CHARACTER_SIZE,
+              }}
+            >
+              <div className="absolute inset-0 bg-teal-600 rounded-full opacity-20 animate-ping" />
+              <div className="absolute inset-0 flex items-center justify-center bg-teal-600 rounded-full text-white text-xs font-bold">
+                {game.id === 5 ? (
+                  <Waves className="w-4 h-4" />
+                ) : (
+                  <Gamepad className="w-4 h-4" />
+                )}
+              </div>
+            </div>
+          ))}
+          
+          {/* Render player */}
+          <div
+            className="absolute transition-all duration-200"
+            style={{
+              left: playerPosition.x - CHARACTER_SIZE / 2,
+              top: playerPosition.y - CHARACTER_SIZE / 2,
+              width: CHARACTER_SIZE,
+              height: CHARACTER_SIZE,
+              zIndex: 20,
+            }}
+          >
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className={`w-full h-full bg-white rounded-full flex items-center justify-center ${
+                playerDirection === Direction.UP ? "rotate-0" :
+                playerDirection === Direction.RIGHT ? "rotate-90" :
+                playerDirection === Direction.DOWN ? "rotate-180" :
+                "rotate-270"
+              }`}>
+                <div className="w-3 h-3 bg-slate-800 rounded-full transform -translate-y-1" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      {/* Game UI */}
+      <div className="absolute top-4 left-4 z-30">
+        <Button
+          className="bg-slate-800/70 hover:bg-slate-700/70"
+          onClick={() => setShowInstructions(!showInstructions)}
+        >
+          <ArrowLeft className="w-5 h-5 mr-2" />
+          Back
+        </Button>
+      </div>
+      
+      {/* Information panel */}
+      <div className="absolute bottom-4 left-4 w-72 z-30">
+        <AnimatePresence mode="wait">
+          {activeLandmark && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="p-4 bg-slate-800/90 text-white rounded-lg backdrop-blur-sm"
+            >
+              <h3 className="text-xl font-bold mb-2">{activeLandmark.name}</h3>
+              <p className="text-sm mb-3">{activeLandmark.description}</p>
+              <img
+                src={activeLandmark.image}
+                alt={activeLandmark.name}
+                className="w-full h-32 object-cover rounded mb-3"
+              />
+              <Button
+                onClick={() => setActiveLandmark(null)}
+                variant="outline"
+                className="w-full border-white/20 hover:bg-white/10 text-white"
+              >
+                Close
+              </Button>
+            </motion.div>
+          )}
+          
+          {activeGame && !activeLandmark && !playingGame && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="p-4 bg-slate-800/90 text-white rounded-lg backdrop-blur-sm"
+            >
+              <h3 className="text-xl font-bold mb-2">{activeGame.name}</h3>
+              <p className="text-sm mb-3">{activeGame.description}</p>
+              <div className="flex gap-2">
+                <Button
+                  onClick={startGame}
+                  className="flex-1 bg-teal-600 hover:bg-teal-700"
+                >
+                  Play Game
+                </Button>
+                <Button
+                  onClick={() => setActiveGame(null)}
+                  variant="outline"
+                  className="flex-1 border-white/20 hover:bg-white/10 text-white"
+                >
+                  Close
+                </Button>
+              </div>
+            </motion.div>
+          )}
+          
+          {playingGame && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              className="bg-slate-800/90 rounded-lg backdrop-blur-sm"
+            >
+              {renderMiniGame()}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+      
+      {/* Controls */}
+      {!playingGame && renderControls()}
+    </div>
+  );
+};
+
+export default KeralaItinerary;
