@@ -98,10 +98,11 @@ const miniGames = [
   },
   {
     id: 5,
-    name: "Boat Race",
+    name: "Onam Boat Race",
     x: 650,
     y: 620,
-    description: "Race traditional boats through the Kerala backwaters.",
+    description: "Race traditional boats through the Kerala backwaters during Onam festival.",
+    highlighted: true
   }
 ];
 
@@ -246,6 +247,12 @@ const KeralaItinerary = () => {
     if (foundGame) {
       setActiveGame(foundGame);
       setActiveLandmark(null);
+
+      // Direct to boat race game immediately if it's the Onam boat race
+      if (foundGame.id === 5) {
+        startGame();
+      }
+      
       return;
     }
     
@@ -341,6 +348,32 @@ const KeralaItinerary = () => {
     
     setActiveLandmark(landmark);
     setActiveGame(null);
+  };
+
+  const navigateToOnamBoatRace = () => {
+    const boatRaceGame = miniGames.find(game => game.id === 5);
+    if (boatRaceGame) {
+      setPlayerPosition({
+        x: boatRaceGame.x,
+        y: boatRaceGame.y - 32
+      });
+      
+      if (mapContainerRef.current) {
+        const containerWidth = mapContainerRef.current.clientWidth;
+        const containerHeight = mapContainerRef.current.clientHeight;
+        
+        setMapPosition({
+          x: containerWidth / 2 - boatRaceGame.x * mapScale,
+          y: containerHeight / 2 - boatRaceGame.y * mapScale
+        });
+      }
+      
+      setActiveGame(boatRaceGame);
+      setActiveLandmark(null);
+      
+      // Start the game immediately
+      startGame();
+    }
   };
 
   const startGame = () => {
@@ -852,9 +885,14 @@ const KeralaItinerary = () => {
 
   return (
     <div 
-      className="relative w-full h-screen overflow-hidden bg-gradient-to-br from-green-900 to-teal-800"
+      className="relative w-full h-screen overflow-hidden"
       onWheel={handleZoom}
     >
+      {/* Old Map Background with aged texture */}
+      <div className="absolute inset-0 bg-amber-100/80 opacity-70">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/old-map.png')] opacity-70"></div>
+      </div>
+      
       <div 
         ref={mapContainerRef}
         className="relative w-full h-full overflow-hidden"
@@ -875,6 +913,29 @@ const KeralaItinerary = () => {
             transform: `translate(${mapPosition.x}px, ${mapPosition.y}px) scale(${mapScale})`,
           }}
         >
+          {/* Map element with old paper texture */}
+          <div className="absolute inset-0 p-4">
+            <div className="border-8 border-amber-900/30 w-full h-full rounded-lg overflow-hidden">
+              <div className="w-full h-full bg-amber-200/80 relative">
+                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/old-map.png')]"></div>
+                
+                {/* Map decorative elements */}
+                <div className="absolute top-10 left-10 text-amber-900/60 text-5xl font-serif rotate-3">Kerala</div>
+                <div className="absolute bottom-10 right-10 opacity-50">
+                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3L14 8H19L15 11L17 16L12 13L7 16L9 11L5 8H10L12 3Z" fill="rgba(120, 53, 15, 0.6)" />
+                  </svg>
+                </div>
+                <div className="absolute top-1/3 right-1/4 opacity-30">
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22ZM12 20C16.42 20 20 16.42 20 12C20 7.58 16.42 4 12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20ZM13 16V13H16V11H13V8H11V11H8V13H11V16H13Z" fill="rgba(120, 53, 15, 0.3)" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Landmarks with vintage style markers */}
           {landmarks.map(landmark => (
             <div
               key={landmark.id}
@@ -887,13 +948,14 @@ const KeralaItinerary = () => {
               }}
               onClick={() => navigateToLandmark(landmark)}
             >
-              <div className="absolute inset-0 bg-yellow-500 rounded-full opacity-30 animate-ping" />
-              <div className="absolute inset-0 flex items-center justify-center bg-yellow-500 rounded-full text-white text-xs font-bold">
+              <div className="absolute inset-0 bg-amber-800 rounded-full opacity-30 animate-ping" />
+              <div className="absolute inset-0 flex items-center justify-center bg-amber-800 rounded-full text-white text-xs font-bold">
                 <MapPin className="w-5 h-5" />
               </div>
             </div>
           ))}
           
+          {/* Mini Games with special highlight for Onam Boat Race */}
           {miniGames.map(game => (
             <div
               key={game.id}
@@ -905,17 +967,28 @@ const KeralaItinerary = () => {
                 height: CHARACTER_SIZE,
               }}
             >
-              <div className="absolute inset-0 bg-teal-600 rounded-full opacity-20 animate-ping" />
-              <div className="absolute inset-0 flex items-center justify-center bg-teal-600 rounded-full text-white text-xs font-bold">
+              <div 
+                className={`absolute inset-0 ${game.id === 5 ? 'bg-red-600' : 'bg-teal-600'} rounded-full opacity-20 animate-ping ${game.id === 5 ? 'animate-pulse' : ''}`} 
+              />
+              <div 
+                className={`absolute inset-0 flex items-center justify-center ${game.id === 5 ? 'bg-red-600' : 'bg-teal-600'} rounded-full text-white text-xs font-bold ${game.id === 5 ? 'ring-2 ring-yellow-400' : ''}`}
+              >
                 {game.id === 5 ? (
-                  <Waves className="w-4 h-4" />
+                  <Waves className="w-5 h-5" />
                 ) : (
                   <Gamepad className="w-4 h-4" />
                 )}
               </div>
+              
+              {game.id === 5 && (
+                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-red-600 text-white text-xs py-1 px-2 rounded-full">
+                  Onam Boat Race
+                </div>
+              )}
             </div>
           ))}
           
+          {/* Player Character */}
           <div
             className="absolute transition-all duration-200"
             style={{
@@ -927,29 +1000,39 @@ const KeralaItinerary = () => {
             }}
           >
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className={`w-full h-full bg-white rounded-full flex items-center justify-center ${
+              <div className={`w-full h-full bg-amber-100 rounded-full border-2 border-amber-800 flex items-center justify-center ${
                 playerDirection === Direction.UP ? "rotate-0" :
                 playerDirection === Direction.RIGHT ? "rotate-90" :
                 playerDirection === Direction.DOWN ? "rotate-180" :
                 "rotate-270"
               }`}>
-                <div className="w-3 h-3 bg-slate-800 rounded-full transform -translate-y-1" />
+                <div className="w-3 h-3 bg-amber-950 rounded-full transform -translate-y-1" />
               </div>
             </div>
           </div>
         </div>
       </div>
       
-      <div className="absolute top-4 left-4 z-30">
+      {/* Top Bar Controls */}
+      <div className="absolute top-4 left-0 right-0 flex justify-between px-4 z-30">
         <Button
-          className="bg-slate-800/70 hover:bg-slate-700/70"
+          className="bg-amber-800/70 hover:bg-amber-700/70 text-amber-100"
           onClick={() => setShowInstructions(!showInstructions)}
         >
           <ArrowLeft className="w-5 h-5 mr-2" />
           Back
         </Button>
+        
+        <Button
+          className="bg-red-600/90 hover:bg-red-700/90 text-white flex items-center gap-2"
+          onClick={navigateToOnamBoatRace}
+        >
+          <Waves className="w-4 h-4" />
+          Go to Onam Boat Race
+        </Button>
       </div>
       
+      {/* Information Panel */}
       <div className="absolute bottom-4 left-4 w-72 z-30">
         <AnimatePresence mode="wait">
           {activeLandmark && (
@@ -957,19 +1040,19 @@ const KeralaItinerary = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="p-4 bg-slate-800/90 text-white rounded-lg backdrop-blur-sm"
+              className="p-4 bg-amber-900/90 text-amber-100 rounded-lg backdrop-blur-sm border border-amber-600/50"
             >
               <h3 className="text-xl font-bold mb-2">{activeLandmark.name}</h3>
               <p className="text-sm mb-3">{activeLandmark.description}</p>
               <img
                 src={activeLandmark.image}
                 alt={activeLandmark.name}
-                className="w-full h-32 object-cover rounded mb-3"
+                className="w-full h-32 object-cover rounded mb-3 border border-amber-600/50"
               />
               <Button
                 onClick={() => setActiveLandmark(null)}
                 variant="outline"
-                className="w-full border-white/20 hover:bg-white/10 text-white"
+                className="w-full border-amber-600/50 hover:bg-amber-800/50 text-amber-100"
               >
                 Close
               </Button>
@@ -981,21 +1064,26 @@ const KeralaItinerary = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 20 }}
-              className="p-4 bg-slate-800/90 text-white rounded-lg backdrop-blur-sm"
+              className={`p-4 ${activeGame.id === 5 ? 'bg-red-900/90 border-red-600/50' : 'bg-amber-900/90 border-amber-600/50'} text-amber-100 rounded-lg backdrop-blur-sm border`}
             >
-              <h3 className="text-xl font-bold mb-2">{activeGame.name}</h3>
+              <h3 className={`text-xl font-bold mb-2 ${activeGame.id === 5 ? 'text-amber-200' : ''}`}>{activeGame.name}</h3>
               <p className="text-sm mb-3">{activeGame.description}</p>
+              {activeGame.id === 5 && (
+                <div className="mb-3 bg-red-800/50 p-2 rounded text-xs border border-red-600/30">
+                  Special Event: Participate in the traditional Onam festival boat race!
+                </div>
+              )}
               <div className="flex gap-2">
                 <Button
                   onClick={startGame}
-                  className="flex-1 bg-teal-600 hover:bg-teal-700"
+                  className={`flex-1 ${activeGame.id === 5 ? 'bg-red-600 hover:bg-red-700' : 'bg-amber-700 hover:bg-amber-800'}`}
                 >
                   Play Game
                 </Button>
                 <Button
                   onClick={() => setActiveGame(null)}
                   variant="outline"
-                  className="flex-1 border-white/20 hover:bg-white/10 text-white"
+                  className="flex-1 border-amber-600/50 hover:bg-amber-800/50 text-amber-100"
                 >
                   Close
                 </Button>
@@ -1017,6 +1105,40 @@ const KeralaItinerary = () => {
       </div>
       
       {!playingGame && renderControls()}
+      
+      {/* Instruction Overlay */}
+      {showInstructions && (
+        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-40">
+          <motion.div 
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="bg-amber-900/90 p-6 rounded-lg max-w-md text-amber-100 border border-amber-600/50"
+          >
+            <h2 className="text-2xl font-bold mb-4 text-amber-200">Kerala Map Explorer</h2>
+            <div className="space-y-4 mb-6">
+              <p>Welcome to the traditional map of Kerala! Explore this ancient land and discover its wonders.</p>
+              <div className="flex items-start gap-3">
+                <MapPin className="w-6 h-6 text-amber-500 flex-shrink-0 mt-1" />
+                <p>Visit <span className="text-amber-300">landmarks</span> to learn about important locations in Kerala.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <Gamepad className="w-6 h-6 text-teal-500 flex-shrink-0 mt-1" />
+                <p>Find <span className="text-teal-300">mini-games</span> scattered across the map to test your knowledge.</p>
+              </div>
+              <div className="flex items-start gap-3">
+                <Waves className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
+                <p>Don't miss the <span className="text-red-300">Onam Boat Race</span> - a special cultural event highlighted on the map!</p>
+              </div>
+            </div>
+            <Button 
+              onClick={() => setShowInstructions(false)} 
+              className="w-full bg-amber-700 hover:bg-amber-800 text-white"
+            >
+              Start Exploring
+            </Button>
+          </motion.div>
+        </div>
+      )}
     </div>
   );
 };
