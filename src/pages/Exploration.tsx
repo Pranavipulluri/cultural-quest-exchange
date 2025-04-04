@@ -9,7 +9,7 @@ import KeralaItinerary from "@/components/KeralaItinerary";
 import { 
   Globe, Compass, Calendar, 
   Map as MapIcon, Info, X,
-  Users, Waves
+  Users
 } from "lucide-react";
 
 const Exploration = () => {
@@ -102,7 +102,7 @@ const Exploration = () => {
                       onClick={() => setShowItinerary(true)}
                     >
                       <MapIcon className="h-4 w-4" />
-                      Kerala Explorer
+                      My Itinerary
                     </Button>
                   </motion.div>
                   <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
@@ -142,66 +142,11 @@ const Exploration = () => {
                 </Card>
               </motion.div>
               
-              {/* Featured Experiences */}
+              {/* Cultural Events Calendar - This is kept as a simpler component to focus on the map */}
               <motion.div
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 transition={{ delay: 0.2 }}
-              >
-                <Card className="bg-slate-800/60 border-0 shadow-xl mb-8">
-                  <CardContent className="p-4">
-                    <div className="flex items-center mb-4">
-                      <Waves className="h-6 w-6 text-teal-400 mr-3" />
-                      <h2 className="text-xl font-bold text-white">Featured Cultural Experiences</h2>
-                    </div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div 
-                        className="bg-gradient-to-r from-red-900/40 to-amber-900/40 rounded-lg p-4 border border-amber-600/30 cursor-pointer hover:scale-[1.02] transition-transform"
-                        onClick={() => setShowItinerary(true)}
-                      >
-                        <div className="flex gap-4 items-center">
-                          <div className="rounded-full bg-red-700/70 p-2">
-                            <Waves className="h-6 w-6 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-white">Onam Boat Race</h3>
-                            <p className="text-gray-300 text-sm">Experience Kerala's famous cultural tradition</p>
-                          </div>
-                        </div>
-                        <div className="mt-3 flex justify-end">
-                          <Button size="sm" className="bg-red-600 hover:bg-red-700" onClick={() => setShowItinerary(true)}>
-                            Play Now
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-gradient-to-r from-teal-900/40 to-slate-800/60 rounded-lg p-4 border border-teal-500/30">
-                        <div className="flex gap-4 items-center">
-                          <div className="rounded-full bg-teal-700/70 p-2">
-                            <MapIcon className="h-6 w-6 text-white" />
-                          </div>
-                          <div>
-                            <h3 className="text-lg font-semibold text-white">Kerala Cultural Tour</h3>
-                            <p className="text-gray-300 text-sm">Explore the rich heritage of God's Own Country</p>
-                          </div>
-                        </div>
-                        <div className="mt-3 flex justify-end">
-                          <Button size="sm" className="bg-teal-600 hover:bg-teal-700" onClick={() => setShowItinerary(true)}>
-                            Explore
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-              
-              {/* Cultural Events Calendar */}
-              <motion.div
-                initial={{ y: 20, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ delay: 0.3 }}
               >
                 <Card className="bg-slate-800/60 border-0 shadow-xl">
                   <CardContent className="p-4">

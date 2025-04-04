@@ -98,12 +98,10 @@ const miniGames = [
   },
   {
     id: 5,
-    name: "Onam Boat Race",
+    name: "Boat Race",
     x: 650,
     y: 620,
-    description: "Race traditional boats through the Kerala backwaters during the Onam festival.",
-    featured: true,
-    icon: <Waves className="h-5 w-5" />
+    description: "Race traditional boats through the Kerala backwaters.",
   }
 ];
 
@@ -125,34 +123,21 @@ const KeralaItinerary = () => {
   const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [showNpcDialog, setShowNpcDialog] = useState(false);
-  const [dialogStep, setDialogStep] = useState(0);
   const [boatRaceState, setBoatRaceState] = useState({
     started: false,
     playerPosition: 0,
-    cpuPositions: [0, 0, 0],
+    aiPosition: 0,
     countdown: 3,
     finished: false,
     winner: '',
-    obstacles: [] as {position: number, lane: number}[],
-    crashedObstacle: false,
+    racePath: Array(10).fill(0).map(() => Math.random() > 0.7 ? 1 : 0),
     playerSpeed: 0,
-    playerLane: 1,
     maxSpeed: 5,
     currentPathIndex: 0
   });
 
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
-  
-  const npcDialogs = [
-    "Namaskaram! Welcome to the famous Kerala boat race, known locally as Vallam Kali.",
-    "These snake boat races are part of our ancient tradition dating back over 400 years. They started as water festivals celebrating the harvest season.",
-    "The iconic boats you see, called 'Chundan Vallams' or snake boats, can be up to 100 feet long and carry over 100 rowers!",
-    "During Onam festival, our biggest celebration, these races attract thousands of spectators from across the world.",
-    "The rhythm and coordination of the rowers is crucial. They move to the beats of traditional vanchipattu (boat songs).",
-    "Would you like to experience the thrill of competing in this cultural treasure of Kerala?",
-  ];
 
   useEffect(() => {
     centerMapOnPlayer();
@@ -172,24 +157,7 @@ const KeralaItinerary = () => {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (playingGame) {
-        if (boatRaceState.started && !boatRaceState.finished && boatRaceState.countdown === 0) {
-          if (e.key === "ArrowUp") {
-            setBoatRaceState(prev => ({
-              ...prev, 
-              playerLane: Math.max(0, prev.playerLane - 1)
-            }));
-          } else if (e.key === "ArrowDown") {
-            setBoatRaceState(prev => ({
-              ...prev, 
-              playerLane: Math.min(2, prev.playerLane + 1)
-            }));
-          } else if (e.key === " " || e.key === "ArrowRight") {
-            increaseBoatSpeed();
-          }
-        }
-        return;
-      }
+      if (playingGame) return;
       
       const moveStep = 16;
       let newDirection = playerDirection;
@@ -228,7 +196,7 @@ const KeralaItinerary = () => {
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [playerPosition, playerDirection, playingGame, boatRaceState]);
+  }, [playerPosition, playerDirection, playingGame]);
   
   const checkLandmarksAndGames = (x: number, y: number) => {
     const foundLandmark = landmarks.find(landmark => 
@@ -248,11 +216,6 @@ const KeralaItinerary = () => {
     if (foundGame) {
       setActiveGame(foundGame);
       setActiveLandmark(null);
-
-      if (foundGame.id === 5) {
-        startGame();
-      }
-      
       return;
     }
     
@@ -350,87 +313,29 @@ const KeralaItinerary = () => {
     setActiveGame(null);
   };
 
-  const navigateToOnamBoatRace = () => {
-    const boatRaceGame = miniGames.find(game => game.id === 5);
-    if (boatRaceGame) {
-      setPlayerPosition({
-        x: boatRaceGame.x,
-        y: boatRaceGame.y - 32
-      });
-      
-      if (mapContainerRef.current) {
-        const containerWidth = mapContainerRef.current.clientWidth;
-        const containerHeight = mapContainerRef.current.clientHeight;
-        
-        setMapPosition({
-          x: containerWidth / 2 - boatRaceGame.x * mapScale,
-          y: containerHeight / 2 - boatRaceGame.y * mapScale
-        });
-      }
-      
-      setActiveGame(boatRaceGame);
-      setActiveLandmark(null);
-      
-      startGame();
-    }
-  };
-
   const startGame = () => {
     if (activeGame) {
-      if (activeGame.id === 5) {
-        setShowNpcDialog(true);
-        setDialogStep(0);
-        setPlayingGame(true);
-      } else {
-        setPlayingGame(true);
-        toast.success(`Starting ${activeGame.name}!`);
-      }
+      setPlayingGame(true);
+      toast.success(`Starting ${activeGame.name}!`);
     }
   };
 
   const endGame = () => {
     setPlayingGame(false);
-    setShowNpcDialog(false);
-    setDialogStep(0);
     toast.success("Game completed! Continue exploring");
   };
 
-  const nextDialogStep = () => {
-    if (dialogStep < npcDialogs.length - 1) {
-      setDialogStep(prev => prev + 1);
-    } else {
-      setShowNpcDialog(false);
-      setPlayingGame(true);
-      toast.success("Starting Kerala Boat Race!");
-    }
-  };
-
-  const generateObstacles = () => {
-    const obstacles = [];
-    for (let i = 0; i < 8; i++) {
-      obstacles.push({
-        position: 15 + (i * 10) + (Math.random() * 5),
-        lane: Math.floor(Math.random() * 3)
-      });
-    }
-    return obstacles;
-  };
-
   const startBoatRace = () => {
-    const obstacles = generateObstacles();
-    
     setBoatRaceState({
       ...boatRaceState,
       started: true,
       playerPosition: 0,
-      cpuPositions: [0, 0, 0],
+      aiPosition: 0,
       countdown: 3,
       finished: false,
       winner: '',
-      obstacles,
-      crashedObstacle: false,
+      racePath: Array(10).fill(0).map(() => Math.random() > 0.7 ? 1 : 0),
       playerSpeed: 0,
-      playerLane: 1,
       maxSpeed: 5,
       currentPathIndex: 0
     });
@@ -443,72 +348,45 @@ const KeralaItinerary = () => {
           clearInterval(countdownInterval);
           const raceInterval = setInterval(() => {
             setBoatRaceState(prev => {
-              if (prev.finished || prev.crashedObstacle) {
-                clearInterval(raceInterval);
-                return prev;
-              }
-              
-              const cpuSpeeds = [
-                1.5 + Math.random() * 1.5,
-                1.8 + Math.random() * 1.7,
-                2.0 + Math.random() * 2.0
-              ];
-              
-              const newCpuPositions = prev.cpuPositions.map((pos, idx) => pos + cpuSpeeds[idx]);
+              const aiSpeed = Math.random() * 2 + 2;
+              const newAiPosition = prev.aiPosition + aiSpeed;
               
               const newPlayerPosition = prev.playerPosition + prev.playerSpeed;
               
-              let crashed = false;
-              prev.obstacles.forEach(obstacle => {
-                if (Math.abs(newPlayerPosition - obstacle.position) < 3 && 
-                    prev.playerLane === obstacle.lane) {
-                  crashed = true;
-                }
-              });
-              
-              if (crashed) {
-                toast.error("Your boat crashed into an obstacle!");
-                return {
-                  ...prev,
-                  crashedObstacle: true,
-                  finished: true,
-                  winner: 'obstacle'
-                };
-              } else if (newPlayerPosition >= 100 || 
-                         newCpuPositions[0] >= 100 || 
-                         newCpuPositions[1] >= 100 || 
-                         newCpuPositions[2] >= 100) {
+              if (newPlayerPosition >= 100 || newAiPosition >= 100) {
                 clearInterval(raceInterval);
-                
-                let winner = 'player';
-                if (newCpuPositions[0] >= 100 && newCpuPositions[0] > newPlayerPosition) winner = 'cpu1';
-                if (newCpuPositions[1] >= 100 && newCpuPositions[1] > newPlayerPosition) winner = 'cpu2';
-                if (newCpuPositions[2] >= 100 && newCpuPositions[2] > newPlayerPosition) winner = 'cpu3';
+                const winner = newPlayerPosition >= 100 ? 'player' : 'ai';
                 
                 if (winner === 'player') {
                   toast.success("You won the boat race!");
                 } else {
-                  toast.error("One of the opponents won this time. Try again!");
+                  toast.error("The opponent won this time. Try again!");
                 }
                 
                 return {
                   ...prev,
                   playerPosition: Math.min(newPlayerPosition, 100),
-                  cpuPositions: [
-                    Math.min(newCpuPositions[0], 100),
-                    Math.min(newCpuPositions[1], 100),
-                    Math.min(newCpuPositions[2], 100)
-                  ],
+                  aiPosition: Math.min(newAiPosition, 100),
                   finished: true,
                   winner
                 };
               }
               
+              const pathIndex = Math.floor(newPlayerPosition / 10);
+              const hitObstacle = pathIndex !== prev.currentPathIndex && 
+                                 pathIndex < prev.racePath.length && 
+                                 prev.racePath[pathIndex] === 1;
+              
+              const updatedSpeed = hitObstacle ? 
+                Math.max(0, prev.playerSpeed - 2) : 
+                prev.playerSpeed;
+              
               return {
                 ...prev,
                 playerPosition: newPlayerPosition,
-                cpuPositions: newCpuPositions,
-                playerSpeed: Math.max(0, prev.playerSpeed - 0.05)
+                aiPosition: newAiPosition,
+                currentPathIndex: pathIndex,
+                playerSpeed: updatedSpeed
               };
             });
           }, 100);
@@ -522,14 +400,7 @@ const KeralaItinerary = () => {
   const increaseBoatSpeed = () => {
     setBoatRaceState(prev => ({
       ...prev,
-      playerSpeed: Math.min(prev.maxSpeed, prev.playerSpeed + 0.3)
-    }));
-  };
-  
-  const changeBoatLane = (lane: number) => {
-    setBoatRaceState(prev => ({
-      ...prev,
-      playerLane: lane
+      playerSpeed: Math.min(prev.maxSpeed, prev.playerSpeed + 0.5)
     }));
   };
   
@@ -538,8 +409,7 @@ const KeralaItinerary = () => {
     setBoatRaceState(prev => ({
       ...prev,
       started: false,
-      finished: false,
-      crashedObstacle: false
+      finished: false
     }));
   };
 
@@ -588,86 +458,64 @@ const KeralaItinerary = () => {
     if (!activeGame) return null;
     
     if (activeGame.id === 5) {
-      if (showNpcDialog) {
-        return renderNpcDialog();
-      }
       return renderBoatRace();
     } else if (activeGame.id === 1) {
       return (
-        <div className="p-4 bg-slate-800 rounded-lg">
+        <motion.div 
+          className="p-4 bg-slate-800 rounded-lg"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
           <h3 className="text-xl font-bold text-white mb-4">Village Quiz</h3>
           <p className="text-gray-300 mb-4">What is this village known for?</p>
           <div className="grid grid-cols-1 gap-2">
-            <div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button onClick={endGame} className="w-full justify-start">A) Fishing</Button>
-            </div>
-            <div>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button onClick={endGame} className="w-full justify-start">B) Farming</Button>
-            </div>
-            <div>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button onClick={endGame} className="w-full justify-start">C) Trading</Button>
-            </div>
-            <div>
+            </motion.div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button onClick={endGame} className="w-full justify-start">D) Mining</Button>
-            </div>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       );
     }
     
     return (
-      <div className="p-4 bg-slate-800 rounded-lg">
+      <motion.div 
+        className="p-4 bg-slate-800 rounded-lg"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      >
         <h3 className="text-xl font-bold text-white mb-4">{activeGame.name}</h3>
         <p className="text-gray-300 mb-4">{activeGame.description}</p>
         <Button onClick={endGame} className="w-full">Complete Game</Button>
-      </div>
-    );
-  };
-
-  const renderNpcDialog = () => {
-    if (!showNpcDialog) return null;
-    
-    return (
-      <div className="p-6 bg-slate-800/95 rounded-lg border-2 border-teal-800/70">
-        <div className="flex items-start gap-4">
-          <div className="rounded-full bg-teal-700 p-2 flex-shrink-0">
-            <Waves className="h-6 w-6 text-white" />
-          </div>
-          
-          <div className="flex-1">
-            <h3 className="text-lg font-bold text-teal-300 mb-2">
-              Kerala Boat Race Guide
-            </h3>
-            
-            <p className="text-white mb-4">
-              {npcDialogs[dialogStep]}
-            </p>
-            
-            <div className="flex justify-end">
-              <Button 
-                onClick={nextDialogStep}
-                className="bg-teal-600 hover:bg-teal-700 text-white"
-              >
-                {dialogStep < npcDialogs.length - 1 ? "Continue" : "Let's Race!"}
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      </motion.div>
     );
   };
 
   const renderBoatRace = () => {
     if (!activeGame || activeGame.id !== 5) return null;
     
-    if (showNpcDialog) {
-      return renderNpcDialog();
-    }
-    
     return (
-      <div className="p-4 bg-slate-800 rounded-lg border-2 border-blue-900/50">
+      <motion.div 
+        className="p-4 bg-slate-800 rounded-lg"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-white">Kerala Chundan Vallam Race</h3>
+          <h3 className="text-xl font-bold text-white">Kerala Boat Race</h3>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -685,10 +533,7 @@ const KeralaItinerary = () => {
               alt="Boat Race" 
               className="w-full h-32 object-cover rounded-lg mb-4 opacity-70"
             />
-            <p className="text-gray-300 mb-6">
-              Race your traditional snake boat through the Kerala backwaters! Use LEFT/RIGHT arrows or buttons to switch lanes and
-              avoid obstacles. Tap SPACE or PADDLE button repeatedly to increase your speed!
-            </p>
+            <p className="text-gray-300 mb-6">Race your traditional boat through the Kerala backwaters. Tap rapidly to increase speed and avoid obstacles!</p>
             <Button onClick={startBoatRace} className="bg-teal-600 hover:bg-teal-700">
               Start Race
             </Button>
@@ -700,7 +545,7 @@ const KeralaItinerary = () => {
           </div>
         ) : (
           <div>
-            <div className="relative h-40 bg-blue-900/50 rounded-lg mb-6 overflow-hidden">
+            <div className="relative h-20 bg-blue-900/50 rounded-lg mb-6 overflow-hidden">
               <div className="absolute inset-0 flex">
                 {Array(20).fill(0).map((_, i) => (
                   <motion.div 
@@ -716,428 +561,465 @@ const KeralaItinerary = () => {
                   />
                 ))}
               </div>
-
-              <div className="absolute top-[33%] left-0 right-0 h-0.5 bg-blue-500/20" />
-              <div className="absolute top-[66%] left-0 right-0 h-0.5 bg-blue-500/20" />
               
               <motion.div 
-                className="absolute h-10 w-20"
+                className="absolute top-2 h-8 w-12 bg-yellow-500 rounded-sm"
                 style={{ 
                   left: `${boatRaceState.playerPosition}%`,
-                  top: `${boatRaceState.playerLane * 33 + 11.5}%`,
                   transform: `translateX(-50%)` 
                 }}
                 animate={{ 
                   y: [0, -2, 0],
-                  rotate: [0, 1, 0, -1, 0]
+                  rotate: [0, 2, 0, -2, 0]
                 }}
                 transition={{ 
                   repeat: Infinity, 
                   duration: 0.5
                 }}
               >
-                <div className="relative">
-                  <div className="absolute h-5 w-20 bg-gradient-to-r from-yellow-800 via-yellow-600 to-yellow-800 rounded-lg transform -skew-x-12" />
-                  
-                  <div className="absolute h-3 w-16 bg-gradient-to-b from-yellow-600 to-yellow-900 rounded-lg top-1 left-2 transform -skew-x-12" />
-                  
-                  <div className="absolute top-0 left-4 w-10 flex justify-around">
-                    <motion.div 
-                      className="h-3 w-1 bg-red-600"
-                      animate={{ rotate: [0, 20, 0, -20, 0] }}
-                      transition={{ repeat: Infinity, duration: 0.5 }}
-                    />
-                    <motion.div 
-                      className="h-3 w-1 bg-red-600"
-                      animate={{ rotate: [0, -20, 0, 20, 0] }}
-                      transition={{ repeat: Infinity, duration: 0.5, delay: 0.1 }}
-                    />
-                    <motion.div 
-                      className="h-3 w-1 bg-red-600"
-                      animate={{ rotate: [0, 20, 0, -20, 0] }}
-                      transition={{ repeat: Infinity, duration: 0.5, delay: 0.2 }}
-                    />
-                  </div>
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-bold">YOU</span>
                 </div>
               </motion.div>
               
-              {boatRaceState.cpuPositions.map((position, idx) => (
-                <motion.div 
-                  key={`cpu-${idx}`}
-                  className="absolute h-9 w-16"
-                  style={{ 
-                    left: `${position}%`, 
-                    top: `${idx * 33 + 12}%`,
-                    transform: `translateX(-50%)`
-                  }}
-                  animate={{ 
-                    y: [0, -1, 0],
-                    rotate: [0, 1, 0, -1, 0]
-                  }}
-                  transition={{ 
-                    repeat: Infinity, 
-                    duration: 0.4 + (idx * 0.1)
-                  }}
-                >
-                  <div className="relative">
-                    <div className={`absolute h-4 w-16 bg-gradient-to-r ${
-                      idx === 0 
-                      ? "from-blue-800 via-blue-600 to-blue-800" 
-                      : idx === 1 
-                        ? "from-green-800 via-green-600 to-green-800" 
-                        : "from-purple-800 via-purple-600 to-purple-800"
-                    } rounded-lg transform -skew-x-12`} />
-                    
-                    <div className={`absolute h-2 w-12 bg-gradient-to-b ${
-                      idx === 0 
-                      ? "from-blue-600 to-blue-800" 
-                      : idx === 1 
-                        ? "from-green-600 to-green-800" 
-                        : "from-purple-600 to-purple-800"
-                    } rounded-lg top-1 left-2 transform -skew-x-12`} />
-                    
-                    <div className="absolute top-0 left-3 w-8 flex justify-around">
-                      <motion.div 
-                        className="h-2 w-1 bg-red-600"
-                        animate={{ rotate: [0, 20, 0, -20, 0] }}
-                        transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.1 }}
-                      />
-                      <motion.div 
-                        className="h-2 w-1 bg-red-600"
-                        animate={{ rotate: [0, -20, 0, 20, 0] }}
-                        transition={{ repeat: Infinity, duration: 0.5, delay: idx * 0.1 + 0.1 }}
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-
-              {boatRaceState.obstacles.map((obstacle, idx) => (
-                <div 
-                  key={`obstacle-${idx}`}
-                  className="absolute h-4 w-4 bg-red-500 rounded-full"
-                  style={{ 
-                    left: `${obstacle.position}%`, 
-                    top: `${obstacle.lane * 33 + 16}%`,
-                  }}
-                />
-              ))}
-            </div>
-            
-            <div className="flex flex-col gap-4">
-              <div className="grid grid-cols-3 gap-2">
-                <div className="col-span-3 text-center text-white text-sm">
-                  {boatRaceState.crashedObstacle ? (
-                    <span className="text-red-400">You crashed!</span>
-                  ) : boatRaceState.finished ? (
-                    <span className={boatRaceState.winner === 'player' ? "text-green-400" : "text-blue-400"}>
-                      {boatRaceState.winner === 'player' ? "You won!" : "A competitor won!"}
-                    </span>
-                  ) : (
-                    <span>
-                      Speed: <span className="text-yellow-400">{Math.round(boatRaceState.playerSpeed * 20)}%</span>
-                    </span>
-                  )}
+              <motion.div 
+                className="absolute bottom-2 h-8 w-12 bg-red-500 rounded-sm"
+                style={{ 
+                  left: `${boatRaceState.aiPosition}%`,
+                  transform: `translateX(-50%)` 
+                }}
+                animate={{ 
+                  y: [0, -2, 0],
+                  rotate: [0, -2, 0, 2, 0]
+                }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 0.5 
+                }}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-bold">CPU</span>
                 </div>
-                
-                <Button 
-                  onClick={() => changeBoatLane(0)}
-                  disabled={boatRaceState.playerLane === 0 || boatRaceState.finished}
-                  className={`py-1 ${boatRaceState.playerLane === 0 ? "bg-teal-700" : "bg-teal-600 hover:bg-teal-500"}`}
-                >
-                  Top Lane
-                </Button>
-                <Button 
-                  onClick={() => changeBoatLane(1)}
-                  disabled={boatRaceState.playerLane === 1 || boatRaceState.finished}
-                  className={`py-1 ${boatRaceState.playerLane === 1 ? "bg-teal-700" : "bg-teal-600 hover:bg-teal-500"}`}
-                >
-                  Middle Lane
-                </Button>
-                <Button 
-                  onClick={() => changeBoatLane(2)}
-                  disabled={boatRaceState.playerLane === 2 || boatRaceState.finished}
-                  className={`py-1 ${boatRaceState.playerLane === 2 ? "bg-teal-700" : "bg-teal-600 hover:bg-teal-500"}`}
-                >
-                  Bottom Lane
-                </Button>
+              </motion.div>
+              
+              <div 
+                className="absolute top-0 bottom-0 right-0 w-1 bg-white"
+                style={{ boxShadow: '0 0 10px rgba(255,255,255,0.8)' }}
+              >
+                <Flag className="absolute -right-3 -top-2 h-5 w-5 text-white" />
               </div>
               
-              <Button 
-                onClick={increaseBoatSpeed}
-                disabled={boatRaceState.finished}
-                className="bg-yellow-600 hover:bg-yellow-500 active:bg-yellow-700 text-white py-2"
-              >
-                PADDLE!
-              </Button>
-              
-              {boatRaceState.finished && (
-                <Button 
-                  onClick={resetBoatRace}
-                  className="mt-2 bg-blue-600 hover:bg-blue-500"
-                >
-                  Try Again
-                </Button>
-              )}
+              {boatRaceState.racePath.map((isObstacle, index) => {
+                if (isObstacle) {
+                  return (
+                    <motion.div 
+                      key={index}
+                      className="absolute top-1/2 transform -translate-y-1/2 h-4 w-4 bg-slate-700 rounded-full"
+                      style={{ left: `${(index + 1) * 10}%` }}
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                    />
+                  );
+                }
+                return null;
+              })}
             </div>
+            
+            <div className="mb-6">
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <span>Speed</span>
+                <span>{Math.round(boatRaceState.playerSpeed * 20)} km/h</span>
+              </div>
+              <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-green-500 to-teal-500 rounded-full"
+                  style={{ width: `${(boatRaceState.playerSpeed / boatRaceState.maxSpeed) * 100}%` }}
+                />
+              </div>
+            </div>
+            
+            {boatRaceState.finished ? (
+              <div className="text-center">
+                <h4 className="text-xl font-bold mb-4">
+                  {boatRaceState.winner === 'player' ? (
+                    <span className="text-green-400">You Won!</span>
+                  ) : (
+                    <span className="text-red-400">You Lost!</span>
+                  )}
+                </h4>
+                <Button onClick={startBoatRace} className="bg-teal-600 hover:bg-teal-700 mr-2">
+                  Race Again
+                </Button>
+                <Button onClick={resetBoatRace} variant="outline">
+                  Exit
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-gray-300 text-sm mb-3 text-center">Tap repeatedly to paddle faster!</p>
+                <motion.div 
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full"
+                >
+                  <Button 
+                    onClick={increaseBoatSpeed}
+                    className="bg-teal-600 hover:bg-teal-700 w-full h-16 text-lg font-bold"
+                  >
+                    PADDLE!
+                  </Button>
+                </motion.div>
+              </div>
+            )}
           </div>
         )}
-      </div>
+      </motion.div>
     );
   };
 
   return (
-    <div 
-      className="relative w-full h-screen overflow-hidden"
-      onWheel={handleZoom}
-    >
-      {/* Old Map Background with aged texture */}
-      <div className="absolute inset-0 bg-amber-100/80 opacity-70">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/old-map.png')] opacity-70"></div>
-      </div>
-      
-      <div 
-        ref={mapContainerRef}
-        className="relative w-full h-full overflow-hidden"
-        onMouseDown={handleMapDragStart}
-        onMouseMove={handleMapDragMove}
-        onMouseUp={handleMapDragEnd}
-        onMouseLeave={handleMapDragEnd}
-        onTouchStart={handleMapDragStart}
-        onTouchMove={handleMapDragMove}
-        onTouchEnd={handleMapDragEnd}
-      >
-        <div 
-          ref={mapRef}
-          className="absolute transform-origin-top-left"
-          style={{
-            width: `${MAP_WIDTH}px`,
-            height: `${MAP_HEIGHT}px`,
-            transform: `translate(${mapPosition.x}px, ${mapPosition.y}px) scale(${mapScale})`,
-          }}
-        >
-          {/* Map element with old paper texture */}
-          <div className="absolute inset-0 p-4">
-            <div className="border-8 border-amber-900/30 w-full h-full rounded-lg overflow-hidden">
-              <div className="w-full h-full bg-amber-200/80 relative">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/old-map.png')]"></div>
-                
-                {/* Map decorative elements */}
-                <div className="absolute top-10 left-10 text-amber-900/60 text-5xl font-serif rotate-3">Kerala</div>
-                <div className="absolute bottom-10 right-10 opacity-50">
-                  <svg width="60" height="60" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 3L14 8H19L15 11L17 16L12 13L7 16L9 11L5 8H10L12 3Z" fill="rgba(120, 53, 15, 0.6)" />
-                  </svg>
-                </div>
-                <div className="absolute top-1/3 right-1/4 opacity-30">
-                  <svg width="80" height="80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2C17.52 2 22 6.48 22 12C22 17.52 17.52 22 12 22ZM12 20C16.42 20 20 16.42 20 12C20 7.58 16.42 4 12 4C7.58 4 4 7.58 4 12C4 16.42 7.58 20 12 20ZM13 16V13H16V11H13V8H11V11H8V13H11V16H13Z" fill="rgba(120, 53, 15, 0.3)" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Landmarks with vintage style markers */}
-          {landmarks.map(landmark => (
-            <div
-              key={landmark.id}
-              className="absolute cursor-pointer transition-transform hover:scale-110"
-              style={{
-                left: landmark.x - CHARACTER_SIZE / 2,
-                top: landmark.y - CHARACTER_SIZE / 2,
-                width: CHARACTER_SIZE,
-                height: CHARACTER_SIZE,
-              }}
-              onClick={() => navigateToLandmark(landmark)}
-            >
-              <div className="absolute inset-0 bg-amber-800 rounded-full opacity-30 animate-ping" />
-              <div className="absolute inset-0 flex items-center justify-center bg-amber-800 rounded-full text-white text-xs font-bold">
-                <MapPin className="w-5 h-5" />
-              </div>
-            </div>
-          ))}
-          
-          {/* Mini Games with special highlight for Onam Boat Race */}
-          {miniGames.map(game => (
-            <div
-              key={game.id}
-              className="absolute cursor-pointer transition-transform hover:scale-110"
-              style={{
-                left: game.x - CHARACTER_SIZE / 2,
-                top: game.y - CHARACTER_SIZE / 2,
-                width: CHARACTER_SIZE,
-                height: CHARACTER_SIZE,
-              }}
-            >
-              <div 
-                className={`absolute inset-0 ${game.id === 5 ? 'bg-red-600' : 'bg-teal-600'} rounded-full opacity-20 animate-ping ${game.id === 5 ? 'animate-pulse' : ''}`} 
-              />
-              <div 
-                className={`absolute inset-0 flex items-center justify-center ${game.id === 5 ? 'bg-red-600' : 'bg-teal-600'} rounded-full text-white text-xs font-bold ${game.id === 5 ? 'ring-2 ring-yellow-400' : ''}`}
-              >
-                {game.id === 5 ? (
-                  <Waves className="w-5 h-5" />
-                ) : (
-                  <Gamepad className="w-4 h-4" />
-                )}
-              </div>
-              
-              {game.id === 5 && (
-                <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-red-600 text-white text-xs py-1 px-2 rounded-full">
-                  Onam Boat Race
-                </div>
-              )}
-            </div>
-          ))}
-          
-          {/* Player Character */}
-          <div
-            className="absolute transition-all duration-200"
-            style={{
-              left: playerPosition.x - CHARACTER_SIZE / 2,
-              top: playerPosition.y - CHARACTER_SIZE / 2,
-              width: CHARACTER_SIZE,
-              height: CHARACTER_SIZE,
-              zIndex: 20,
-            }}
+    <div className="bg-slate-900 p-4 rounded-lg w-full h-full overflow-hidden">
+      <div className="flex items-center mb-4">
+        <Button variant="ghost" className="mr-2" onClick={() => window.history.back()}>
+          <ArrowLeft className="h-5 w-5 text-white" />
+        </Button>
+        <h2 className="text-2xl font-bold text-white">Village Explorer</h2>
+        
+        <div className="ml-auto flex gap-2">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setMapScale(prev => Math.max(0.5, prev - 0.1))}
+            className="w-8 h-8 p-0 rounded-full"
           >
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className={`w-full h-full bg-amber-100 rounded-full border-2 border-amber-800 flex items-center justify-center ${
-                playerDirection === Direction.UP ? "rotate-0" :
-                playerDirection === Direction.RIGHT ? "rotate-90" :
-                playerDirection === Direction.DOWN ? "rotate-180" :
-                "rotate-270"
-              }`}>
-                <div className="w-3 h-3 bg-amber-950 rounded-full transform -translate-y-1" />
-              </div>
-            </div>
-          </div>
+            -
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => setMapScale(prev => Math.min(2.0, prev + 0.1))}
+            className="w-8 h-8 p-0 rounded-full"
+          >
+            +
+          </Button>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={centerMapOnPlayer}
+            className="text-xs"
+          >
+            Center
+          </Button>
         </div>
       </div>
       
-      {/* Top Bar Controls */}
-      <div className="absolute top-4 left-0 right-0 flex justify-between px-4 z-30">
-        <Button
-          className="bg-amber-800/70 hover:bg-amber-700/70 text-amber-100"
-          onClick={() => setShowInstructions(!showInstructions)}
+      {showInstructions && (
+        <motion.div 
+          className="bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg mb-4 text-white"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          <ArrowLeft className="w-5 h-5 mr-2" />
-          Back
-        </Button>
-        
-        <Button
-          className="bg-red-600/90 hover:bg-red-700/90 text-white flex items-center gap-2"
-          onClick={navigateToOnamBoatRace}
-        >
-          <Waves className="w-4 h-4" />
-          Go to Onam Boat Race
-        </Button>
-      </div>
-      
-      {/* Information Panel */}
-      <div className="absolute bottom-4 left-4 w-72 z-30">
-        <AnimatePresence mode="wait">
-          {activeLandmark && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="p-4 bg-amber-900/90 text-amber-100 rounded-lg backdrop-blur-sm border border-amber-600/50"
+          <div className="flex justify-between items-start">
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Welcome to Village Explorer!</h3>
+              <p className="text-sm text-gray-300 mb-2">Use arrow keys or on-screen controls to move your character.</p>
+              <p className="text-sm text-gray-300">Visit landmarks and mini-games to discover village attractions.</p>
+            </div>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowInstructions(false)}
+              className="text-gray-400 hover:text-white"
             >
-              <h3 className="text-xl font-bold mb-2">{activeLandmark.name}</h3>
-              <p className="text-sm mb-3">{activeLandmark.description}</p>
-              <img
-                src={activeLandmark.image}
-                alt={activeLandmark.name}
-                className="w-full h-32 object-cover rounded mb-3 border border-amber-600/50"
-              />
-              <Button
-                onClick={() => setActiveLandmark(null)}
-                variant="outline"
-                className="w-full border-amber-600/50 hover:bg-amber-800/50 text-amber-100"
+              Close
+            </Button>
+          </div>
+        </motion.div>
+      )}
+
+      <AnimatePresence mode="wait">
+        {playingGame ? (
+          <motion.div 
+            key="game-mode"
+            className="mt-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            {renderMiniGame()}
+          </motion.div>
+        ) : (
+          <motion.div
+            key="map-mode"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="relative"
+          >
+            <div 
+              ref={mapContainerRef}
+              className="relative bg-green-800 rounded-lg overflow-hidden shadow-xl border border-teal-900/50 h-[60vh]" 
+              onWheel={handleZoom}
+              onMouseDown={handleMapDragStart}
+              onMouseMove={handleMapDragMove}
+              onMouseUp={handleMapDragEnd}
+              onMouseLeave={handleMapDragEnd}
+              onTouchStart={handleMapDragStart}
+              onTouchMove={handleMapDragMove}
+              onTouchEnd={handleMapDragEnd}
+            >
+              <div 
+                ref={mapRef}
+                className="absolute origin-top-left transition-transform duration-200"
+                style={{ 
+                  transform: `scale(${mapScale})`,
+                  left: `${mapPosition.x}px`,
+                  top: `${mapPosition.y}px`,
+                }}
               >
-                Close
-              </Button>
-            </motion.div>
-          )}
-          
-          {activeGame && !activeLandmark && !playingGame && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className={`p-4 ${activeGame.id === 5 ? 'bg-red-900/90 border-red-600/50' : 'bg-amber-900/90 border-amber-600/50'} text-amber-100 rounded-lg backdrop-blur-sm border`}
-            >
-              <h3 className={`text-xl font-bold mb-2 ${activeGame.id === 5 ? 'text-amber-200' : ''}`}>{activeGame.name}</h3>
-              <p className="text-sm mb-3">{activeGame.description}</p>
-              {activeGame.id === 5 && (
-                <div className="mb-3 bg-red-800/50 p-2 rounded text-xs border border-red-600/30">
-                  Special Event: Participate in the traditional Onam festival boat race!
+                <div className="relative">
+                  <img 
+                    src="/lovable-uploads/f55a5bc8-b4e5-446a-9803-84768ce13250.png" 
+                    alt="Village Map" 
+                    className="w-[1000px] h-[1000px] object-cover pixel-art"
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                  
+                  {landmarks.map(landmark => (
+                    <motion.div
+                      key={`landmark-${landmark.id}`}
+                      className="absolute cursor-pointer"
+                      style={{ 
+                        left: landmark.x - 12, 
+                        top: landmark.y - 12,
+                        zIndex: 10
+                      }}
+                      whileHover={{ scale: 1.2 }}
+                      animate={{ 
+                        scale: [1, 1.1, 1],
+                      }}
+                      transition={{ repeat: Infinity, duration: 2 }}
+                      onClick={() => navigateToLandmark(landmark)}
+                    >
+                      <div className="w-[24px] h-[24px] bg-red-500 rounded-full flex items-center justify-center">
+                        <MapPin className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-slate-800/90 text-white text-xs py-1 px-2 rounded mb-1">
+                        {landmark.name}
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  {miniGames.map(game => (
+                    <motion.div
+                      key={`game-${game.id}`}
+                      className="absolute cursor-pointer"
+                      style={{ 
+                        left: game.x - 12, 
+                        top: game.y - 12,
+                        zIndex: 10
+                      }}
+                      whileHover={{ scale: 1.2 }}
+                      animate={{ 
+                        rotate: [0, 10, -10, 0],
+                      }}
+                      transition={{ repeat: Infinity, duration: 3 }}
+                      onClick={() => {
+                        setPlayerPosition({ x: game.x, y: game.y });
+                        setActiveGame(game);
+                        setActiveLandmark(null);
+                      }}
+                    >
+                      <div className="w-[24px] h-[24px] bg-purple-500 rounded-lg flex items-center justify-center">
+                        <Gamepad className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-slate-800/90 text-white text-xs py-1 px-2 rounded mb-1">
+                        {game.name}
+                      </div>
+                    </motion.div>
+                  ))}
+                  
+                  <motion.div 
+                    className="absolute z-20"
+                    style={{ 
+                      left: playerPosition.x - CHARACTER_SIZE/2, 
+                      top: playerPosition.y - CHARACTER_SIZE/2,
+                      width: CHARACTER_SIZE,
+                      height: CHARACTER_SIZE
+                    }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                  >
+                    <motion.div 
+                      className="w-full h-full bg-yellow-500 rounded-sm relative overflow-hidden flex items.center justify-center pixelated"
+                      style={{ 
+                        imageRendering: 'pixelated',
+                        boxShadow: '0 3px 0 rgba(0,0,0,0.3)'
+                      }}
+                      animate={{ y: [0, -2, 0] }}
+                      transition={{ repeat: Infinity, duration: 0.5 }}
+                    >
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-full h-full relative">
+                          <div className="absolute top-1/4 left-1/3 w-[4px] h-[4px] bg-black rounded-none" />
+                          <div className="absolute top-1/4 right-1/3 w-[4px] h-[4px] bg-black rounded-none" />
+                          <div 
+                            className="absolute top-1/2 left-1/4 w-[12px] h-[4px] bg-black rounded-none"
+                            style={{
+                              transform: 
+                                playerDirection === Direction.UP ? 'translateY(-4px)' : 
+                                playerDirection === Direction.DOWN ? 'translateY(4px)' : 
+                                playerDirection === Direction.LEFT ? 'translateX(-4px) rotate(90deg)' : 
+                                'translateX(4px) rotate(90deg)'
+                            }} 
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  </motion.div>
                 </div>
-              )}
-              <div className="flex gap-2">
-                <Button
-                  onClick={startGame}
-                  className={`flex-1 ${activeGame.id === 5 ? 'bg-red-600 hover:bg-red-700' : 'bg-amber-700 hover:bg-amber-800'}`}
-                >
-                  Play Game
-                </Button>
-                <Button
-                  onClick={() => setActiveGame(null)}
-                  variant="outline"
-                  className="flex-1 border-amber-600/50 hover:bg-amber-800/50 text-amber-100"
-                >
-                  Close
-                </Button>
               </div>
-            </motion.div>
-          )}
-          
-          {playingGame && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 20 }}
-              className="bg-slate-800/90 rounded-lg backdrop-blur-sm"
-            >
-              {renderMiniGame()}
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </div>
+              
+              <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-slate-900/30" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {activeLandmark && !playingGame && (
+          <motion.div 
+            key={`landmark-${activeLandmark.id}`}
+            className="mt-4 bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg text-white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <div className="flex flex-col md:flex-row items-start gap-4">
+              {activeLandmark.image && (
+                <motion.img 
+                  src={activeLandmark.image} 
+                  alt={activeLandmark.name} 
+                  className="w-full md:w-40 h-32 object-cover rounded-lg"
+                  initial={{ scale: 0.95, opacity: 0.8 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                />
+              )}
+              <div>
+                <motion.h3 
+                  className="text-xl font-bold mb-1 flex items-center gap-2"
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  <MapPin className="h-5 w-5 text-red-500" />
+                  {activeLandmark.name}
+                </motion.h3>
+                <motion.p 
+                  className="text-gray-300"
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {activeLandmark.description}
+                </motion.p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      <AnimatePresence>
+        {activeGame && !playingGame && (
+          <motion.div 
+            key={`game-${activeGame.id}`}
+            className="mt-4 bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg text-white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          >
+            <div className="flex items-start gap-3">
+              <motion.div 
+                className="bg-purple-500 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
+                initial={{ rotate: -10, scale: 0.9 }}
+                animate={{ rotate: 0, scale: 1 }}
+                transition={{ type: "spring", stiffness: 200 }}
+              >
+                <Gamepad className="h-5 w-5 text-white" />
+              </motion.div>
+              <div>
+                <motion.h3 
+                  className="text-xl font-bold mb-1"
+                  initial={{ y: -5, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  {activeGame.name}
+                </motion.h3>
+                <motion.p 
+                  className="text-gray-300 mb-3"
+                  initial={{ y: -5, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.2 }}
+                >
+                  {activeGame.description}
+                </motion.p>
+                <motion.div
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Button onClick={startGame} className="bg-purple-600 hover:bg-purple-700">
+                    Start Game
+                  </Button>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      {!playingGame && (
+        <motion.div 
+          className="mt-4 bg-slate-800/80 p-3 rounded-lg"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          <h3 className="text-white text-sm font-semibold mb-2 flex items-center">
+            Quick Travel
+          </h3>
+          <div className="flex flex-wrap gap-2">
+            {landmarks.map(landmark => (
+              <Button 
+                key={landmark.id} 
+                size="sm" 
+                variant="outline" 
+                className="text-xs"
+                onClick={() => navigateToLandmark(landmark)}
+              >
+                <MapPin className="h-3 w-3 mr-1" /> {landmark.name}
+              </Button>
+            ))}
+          </div>
+        </motion.div>
+      )}
       
       {!playingGame && renderControls()}
       
-      {/* Instruction Overlay */}
-      {showInstructions && (
-        <div className="absolute inset-0 bg-black/70 flex items-center justify-center z-40">
-          <div className="bg-slate-800 p-6 rounded-lg max-w-md text-amber-100 border border-amber-600/50">
-            <h2 className="text-2xl font-bold mb-4 text-amber-200">Kerala Map Explorer</h2>
-            <div className="space-y-4 mb-6">
-              <p>Welcome to the traditional map of Kerala! Explore this ancient land and discover its wonders.</p>
-              <div className="flex items-start gap-3">
-                <MapPin className="w-6 h-6 text-amber-500 flex-shrink-0 mt-1" />
-                <p>Visit <span className="text-amber-300">landmarks</span> to learn about important locations in Kerala.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <Gamepad className="w-6 h-6 text-teal-500 flex-shrink-0 mt-1" />
-                <p>Find <span className="text-teal-300">mini-games</span> scattered across the map to test your knowledge.</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <Waves className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
-                <p>Don't miss the <span className="text-red-300">Onam Boat Race</span> - a special cultural event highlighted on the map!</p>
-              </div>
-            </div>
-            <Button 
-              onClick={() => setShowInstructions(false)} 
-              className="w-full bg-amber-700 hover:bg-amber-800 text-white"
-            >
-              Start Exploring
-            </Button>
-          </div>
-        </div>
-      )}
+      <style>{`
+        .pixel-art {
+          image-rendering: pixelated;
+          image-rendering: -moz-crisp-edges;
+          image-rendering: crisp-edges;
+        }
+      `}</style>
     </div>
   );
 };
