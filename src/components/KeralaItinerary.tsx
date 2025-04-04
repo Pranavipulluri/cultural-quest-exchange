@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, TreePalm, Image, Gamepad, Waves } from "lucide-react";
+import { ArrowLeft, MapPin, TreePalm, Image, Gamepad, Waves, ChevronLeft, ChevronRight, Flag } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -95,6 +95,13 @@ const miniGames = [
     x: 600,
     y: 250,
     description: "Help gather crops from the local farm.",
+  },
+  {
+    id: 5,
+    name: "Boat Race",
+    x: 650,
+    y: 620,
+    description: "Race traditional boats through the Kerala backwaters.",
   }
 ];
 
@@ -116,7 +123,19 @@ const KeralaItinerary = () => {
   const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  
+  const [boatRaceState, setBoatRaceState] = useState({
+    started: false,
+    playerPosition: 0,
+    aiPosition: 0,
+    countdown: 3,
+    finished: false,
+    winner: '',
+    racePath: Array(10).fill(0).map(() => Math.random() > 0.7 ? 1 : 0),
+    playerSpeed: 0,
+    maxSpeed: 5,
+    currentPathIndex: 0
+  });
+
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
 
@@ -306,6 +325,94 @@ const KeralaItinerary = () => {
     toast.success("Game completed! Continue exploring");
   };
 
+  const startBoatRace = () => {
+    setBoatRaceState({
+      ...boatRaceState,
+      started: true,
+      playerPosition: 0,
+      aiPosition: 0,
+      countdown: 3,
+      finished: false,
+      winner: '',
+      racePath: Array(10).fill(0).map(() => Math.random() > 0.7 ? 1 : 0),
+      playerSpeed: 0,
+      maxSpeed: 5,
+      currentPathIndex: 0
+    });
+    
+    const countdownInterval = setInterval(() => {
+      setBoatRaceState(prev => {
+        if (prev.countdown > 1) {
+          return { ...prev, countdown: prev.countdown - 1 };
+        } else {
+          clearInterval(countdownInterval);
+          const raceInterval = setInterval(() => {
+            setBoatRaceState(prev => {
+              const aiSpeed = Math.random() * 2 + 2;
+              const newAiPosition = prev.aiPosition + aiSpeed;
+              
+              const newPlayerPosition = prev.playerPosition + prev.playerSpeed;
+              
+              if (newPlayerPosition >= 100 || newAiPosition >= 100) {
+                clearInterval(raceInterval);
+                const winner = newPlayerPosition >= 100 ? 'player' : 'ai';
+                
+                if (winner === 'player') {
+                  toast.success("You won the boat race!");
+                } else {
+                  toast.error("The opponent won this time. Try again!");
+                }
+                
+                return {
+                  ...prev,
+                  playerPosition: Math.min(newPlayerPosition, 100),
+                  aiPosition: Math.min(newAiPosition, 100),
+                  finished: true,
+                  winner
+                };
+              }
+              
+              const pathIndex = Math.floor(newPlayerPosition / 10);
+              const hitObstacle = pathIndex !== prev.currentPathIndex && 
+                                 pathIndex < prev.racePath.length && 
+                                 prev.racePath[pathIndex] === 1;
+              
+              const updatedSpeed = hitObstacle ? 
+                Math.max(0, prev.playerSpeed - 2) : 
+                prev.playerSpeed;
+              
+              return {
+                ...prev,
+                playerPosition: newPlayerPosition,
+                aiPosition: newAiPosition,
+                currentPathIndex: pathIndex,
+                playerSpeed: updatedSpeed
+              };
+            });
+          }, 100);
+          
+          return { ...prev, countdown: 0 };
+        }
+      });
+    }, 1000);
+  };
+
+  const increaseBoatSpeed = () => {
+    setBoatRaceState(prev => ({
+      ...prev,
+      playerSpeed: Math.min(prev.maxSpeed, prev.playerSpeed + 0.5)
+    }));
+  };
+  
+  const resetBoatRace = () => {
+    setPlayingGame(false);
+    setBoatRaceState(prev => ({
+      ...prev,
+      started: false,
+      finished: false
+    }));
+  };
+
   const renderControls = () => (
     <div className="absolute bottom-4 right-4 grid grid-cols-3 gap-2 w-36 h-36">
       <div className="col-start-2">
@@ -350,7 +457,9 @@ const KeralaItinerary = () => {
   const renderMiniGame = () => {
     if (!activeGame) return null;
     
-    if (activeGame.id === 1) {
+    if (activeGame.id === 5) {
+      return renderBoatRace();
+    } else if (activeGame.id === 1) {
       return (
         <motion.div 
           className="p-4 bg-slate-800 rounded-lg"
@@ -390,6 +499,179 @@ const KeralaItinerary = () => {
         <h3 className="text-xl font-bold text-white mb-4">{activeGame.name}</h3>
         <p className="text-gray-300 mb-4">{activeGame.description}</p>
         <Button onClick={endGame} className="w-full">Complete Game</Button>
+      </motion.div>
+    );
+  };
+
+  const renderBoatRace = () => {
+    if (!activeGame || activeGame.id !== 5) return null;
+    
+    return (
+      <motion.div 
+        className="p-4 bg-slate-800 rounded-lg"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+      >
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="text-xl font-bold text-white">Kerala Boat Race</h3>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={resetBoatRace}
+            className="text-gray-400 hover:text-white"
+          >
+            Exit Race
+          </Button>
+        </div>
+        
+        {!boatRaceState.started ? (
+          <div className="text-center">
+            <img 
+              src="/lovable-uploads/ca2d6830-e22c-4607-b372-bf96d604334a.png" 
+              alt="Boat Race" 
+              className="w-full h-32 object-cover rounded-lg mb-4 opacity-70"
+            />
+            <p className="text-gray-300 mb-6">Race your traditional boat through the Kerala backwaters. Tap rapidly to increase speed and avoid obstacles!</p>
+            <Button onClick={startBoatRace} className="bg-teal-600 hover:bg-teal-700">
+              Start Race
+            </Button>
+          </div>
+        ) : boatRaceState.countdown > 0 ? (
+          <div className="flex flex-col items-center justify-center py-10">
+            <div className="text-5xl font-bold text-white mb-4">{boatRaceState.countdown}</div>
+            <p className="text-gray-300">Get ready to race!</p>
+          </div>
+        ) : (
+          <div>
+            <div className="relative h-20 bg-blue-900/50 rounded-lg mb-6 overflow-hidden">
+              <div className="absolute inset-0 flex">
+                {Array(20).fill(0).map((_, i) => (
+                  <motion.div 
+                    key={i}
+                    className="h-1 bg-blue-400/20 rounded-full"
+                    style={{ width: `${100/20}%` }}
+                    animate={{ y: [0, 5, 0] }}
+                    transition={{ 
+                      repeat: Infinity, 
+                      duration: 1.5, 
+                      delay: i * 0.1 % 0.5 
+                    }}
+                  />
+                ))}
+              </div>
+              
+              <motion.div 
+                className="absolute top-2 h-8 w-12 bg-yellow-500 rounded-sm"
+                style={{ 
+                  left: `${boatRaceState.playerPosition}%`,
+                  transform: `translateX(-50%)` 
+                }}
+                animate={{ 
+                  y: [0, -2, 0],
+                  rotate: [0, 2, 0, -2, 0]
+                }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 0.5
+                }}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-bold">YOU</span>
+                </div>
+              </motion.div>
+              
+              <motion.div 
+                className="absolute bottom-2 h-8 w-12 bg-red-500 rounded-sm"
+                style={{ 
+                  left: `${boatRaceState.aiPosition}%`,
+                  transform: `translateX(-50%)` 
+                }}
+                animate={{ 
+                  y: [0, -2, 0],
+                  rotate: [0, -2, 0, 2, 0]
+                }}
+                transition={{ 
+                  repeat: Infinity, 
+                  duration: 0.5 
+                }}
+              >
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <span className="text-xs font-bold">CPU</span>
+                </div>
+              </motion.div>
+              
+              <div 
+                className="absolute top-0 bottom-0 right-0 w-1 bg-white"
+                style={{ boxShadow: '0 0 10px rgba(255,255,255,0.8)' }}
+              >
+                <Flag className="absolute -right-3 -top-2 h-5 w-5 text-white" />
+              </div>
+              
+              {boatRaceState.racePath.map((isObstacle, index) => {
+                if (isObstacle) {
+                  return (
+                    <motion.div 
+                      key={index}
+                      className="absolute top-1/2 transform -translate-y-1/2 h-4 w-4 bg-slate-700 rounded-full"
+                      style={{ left: `${(index + 1) * 10}%` }}
+                      animate={{ scale: [1, 1.2, 1] }}
+                      transition={{ repeat: Infinity, duration: 1 }}
+                    />
+                  );
+                }
+                return null;
+              })}
+            </div>
+            
+            <div className="mb-6">
+              <div className="flex justify-between text-xs text-gray-400 mb-1">
+                <span>Speed</span>
+                <span>{Math.round(boatRaceState.playerSpeed * 20)} km/h</span>
+              </div>
+              <div className="w-full h-2 bg-slate-700 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-green-500 to-teal-500 rounded-full"
+                  style={{ width: `${(boatRaceState.playerSpeed / boatRaceState.maxSpeed) * 100}%` }}
+                />
+              </div>
+            </div>
+            
+            {boatRaceState.finished ? (
+              <div className="text-center">
+                <h4 className="text-xl font-bold mb-4">
+                  {boatRaceState.winner === 'player' ? (
+                    <span className="text-green-400">You Won!</span>
+                  ) : (
+                    <span className="text-red-400">You Lost!</span>
+                  )}
+                </h4>
+                <Button onClick={startBoatRace} className="bg-teal-600 hover:bg-teal-700 mr-2">
+                  Race Again
+                </Button>
+                <Button onClick={resetBoatRace} variant="outline">
+                  Exit
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <p className="text-gray-300 text-sm mb-3 text-center">Tap repeatedly to paddle faster!</p>
+                <motion.div 
+                  whileTap={{ scale: 0.95 }}
+                  className="w-full"
+                >
+                  <Button 
+                    onClick={increaseBoatSpeed}
+                    className="bg-teal-600 hover:bg-teal-700 w-full h-16 text-lg font-bold"
+                  >
+                    PADDLE!
+                  </Button>
+                </motion.div>
+              </div>
+            )}
+          </div>
+        )}
       </motion.div>
     );
   };
