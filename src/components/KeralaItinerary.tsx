@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, TreePalm, Image, Gamepad, Waves, ChevronLeft, ChevronRight, Flag } from "lucide-react";
@@ -144,7 +143,6 @@ const KeralaItinerary = () => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<HTMLDivElement>(null);
   
-  // NPC dialog content about the cultural significance of boat races
   const npcDialogs = [
     "Namaskaram! Welcome to the famous Kerala boat race, known locally as Vallam Kali.",
     "These snake boat races are part of our ancient tradition dating back over 400 years. They started as water festivals celebrating the harvest season.",
@@ -309,7 +307,7 @@ const KeralaItinerary = () => {
     
     if ('touches' in event) {
       clientX = event.touches[0].clientX;
-      clientY = event.clientY;
+      clientY = event.touches[0].clientY;
     } else {
       clientX = event.clientX;
       clientY = event.clientY;
@@ -347,7 +345,6 @@ const KeralaItinerary = () => {
 
   const startGame = () => {
     if (activeGame) {
-      // For boat race, show NPC dialog first
       if (activeGame.id === 5) {
         setShowNpcDialog(true);
         setDialogStep(0);
@@ -376,13 +373,11 @@ const KeralaItinerary = () => {
   };
 
   const generateObstacles = () => {
-    // Generate random obstacles throughout the race path
     const obstacles = [];
-    // Create 8 obstacles at different positions
     for (let i = 0; i < 8; i++) {
       obstacles.push({
-        position: 15 + (i * 10) + (Math.random() * 5), // Distribute obstacles between 15% and 95% of race track
-        lane: Math.floor(Math.random() * 3) // Random lane (0, 1, or 2)
+        position: 15 + (i * 10) + (Math.random() * 5),
+        lane: Math.floor(Math.random() * 3)
       });
     }
     return obstacles;
@@ -415,35 +410,29 @@ const KeralaItinerary = () => {
           clearInterval(countdownInterval);
           const raceInterval = setInterval(() => {
             setBoatRaceState(prev => {
-              // Don't update if race is finished or player crashed
               if (prev.finished || prev.crashedObstacle) {
                 clearInterval(raceInterval);
                 return prev;
               }
               
-              // Update CPU boats (three of them, with varying speeds)
               const cpuSpeeds = [
-                1.5 + Math.random() * 1.5, // Slowest boat
-                1.8 + Math.random() * 1.7, // Medium boat
-                2.0 + Math.random() * 2.0  // Fastest boat
+                1.5 + Math.random() * 1.5,
+                1.8 + Math.random() * 1.7,
+                2.0 + Math.random() * 2.0
               ];
               
               const newCpuPositions = prev.cpuPositions.map((pos, idx) => pos + cpuSpeeds[idx]);
               
-              // Update player position based on speed
               const newPlayerPosition = prev.playerPosition + prev.playerSpeed;
               
-              // Check for collisions with obstacles
               let crashed = false;
               prev.obstacles.forEach(obstacle => {
-                // Check if player is within 5% of obstacle position and in same lane
                 if (Math.abs(newPlayerPosition - obstacle.position) < 3 && 
                     prev.playerLane === obstacle.lane) {
                   crashed = true;
                 }
               });
               
-              // Check for finish or crash
               if (crashed) {
                 toast.error("Your boat crashed into an obstacle!");
                 return {
@@ -482,12 +471,11 @@ const KeralaItinerary = () => {
                 };
               }
               
-              // Normal update - speed gradually decreases if not paddling
               return {
                 ...prev,
                 playerPosition: newPlayerPosition,
                 cpuPositions: newCpuPositions,
-                playerSpeed: Math.max(0, prev.playerSpeed - 0.05) // Slow down slightly each tick
+                playerSpeed: Math.max(0, prev.playerSpeed - 0.05)
               };
             });
           }, 100);
@@ -636,7 +624,6 @@ const KeralaItinerary = () => {
   const renderBoatRace = () => {
     if (!activeGame || activeGame.id !== 5) return null;
     
-    // Render boat race dialog if showing
     if (showNpcDialog) {
       return renderNpcDialog();
     }
@@ -678,7 +665,6 @@ const KeralaItinerary = () => {
         ) : (
           <div>
             <div className="relative h-40 bg-blue-900/50 rounded-lg mb-6 overflow-hidden">
-              {/* Water background animation */}
               <div className="absolute inset-0 flex">
                 {Array(20).fill(0).map((_, i) => (
                   <motion.div 
@@ -695,11 +681,9 @@ const KeralaItinerary = () => {
                 ))}
               </div>
 
-              {/* Lane dividers */}
               <div className="absolute top-[33%] left-0 right-0 h-0.5 bg-blue-500/20" />
               <div className="absolute top-[66%] left-0 right-0 h-0.5 bg-blue-500/20" />
               
-              {/* Player Boat */}
               <motion.div 
                 className="absolute h-10 w-20"
                 style={{ 
@@ -717,13 +701,10 @@ const KeralaItinerary = () => {
                 }}
               >
                 <div className="relative">
-                  {/* Boat hull */}
                   <div className="absolute h-5 w-20 bg-gradient-to-r from-yellow-800 via-yellow-600 to-yellow-800 rounded-lg transform -skew-x-12" />
                   
-                  {/* Boat interior */}
                   <div className="absolute h-3 w-16 bg-gradient-to-b from-yellow-600 to-yellow-900 rounded-lg top-1 left-2 transform -skew-x-12" />
                   
-                  {/* Rowers */}
                   <div className="absolute top-0 left-4 w-10 flex justify-around">
                     <motion.div 
                       className="h-3 w-1 bg-red-600"
@@ -744,7 +725,6 @@ const KeralaItinerary = () => {
                 </div>
               </motion.div>
               
-              {/* CPU Boats */}
               {boatRaceState.cpuPositions.map((position, idx) => (
                 <motion.div 
                   key={`cpu-${idx}`}
@@ -764,7 +744,6 @@ const KeralaItinerary = () => {
                   }}
                 >
                   <div className="relative">
-                    {/* CPU Boat hull */}
                     <div className={`absolute h-4 w-16 bg-gradient-to-r ${
                       idx === 0 
                       ? "from-blue-800 via-blue-600 to-blue-800" 
@@ -773,7 +752,6 @@ const KeralaItinerary = () => {
                         : "from-purple-800 via-purple-600 to-purple-800"
                     } rounded-lg transform -skew-x-12`} />
                     
-                    {/* CPU Boat interior */}
                     <div className={`absolute h-2 w-12 bg-gradient-to-b ${
                       idx === 0 
                       ? "from-blue-600 to-blue-800" 
@@ -782,7 +760,6 @@ const KeralaItinerary = () => {
                         : "from-purple-600 to-purple-800"
                     } rounded-lg top-1 left-2 transform -skew-x-12`} />
                     
-                    {/* CPU Rowers */}
                     <div className="absolute top-0 left-3 w-8 flex justify-around">
                       <motion.div 
                         className="h-2 w-1 bg-red-600"
@@ -799,7 +776,6 @@ const KeralaItinerary = () => {
                 </motion.div>
               ))}
 
-              {/* Obstacles */}
               {boatRaceState.obstacles.map((obstacle, idx) => (
                 <div 
                   key={`obstacle-${idx}`}
@@ -812,7 +788,6 @@ const KeralaItinerary = () => {
               ))}
             </div>
             
-            {/* Race Controls */}
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-3 gap-2">
                 <div className="col-span-3 text-center text-white text-sm">
@@ -880,7 +855,6 @@ const KeralaItinerary = () => {
       className="relative w-full h-screen overflow-hidden bg-gradient-to-br from-green-900 to-teal-800"
       onWheel={handleZoom}
     >
-      {/* Map container */}
       <div 
         ref={mapContainerRef}
         className="relative w-full h-full overflow-hidden"
@@ -892,7 +866,6 @@ const KeralaItinerary = () => {
         onTouchMove={handleMapDragMove}
         onTouchEnd={handleMapDragEnd}
       >
-        {/* Map */}
         <div 
           ref={mapRef}
           className="absolute transform-origin-top-left"
@@ -902,7 +875,6 @@ const KeralaItinerary = () => {
             transform: `translate(${mapPosition.x}px, ${mapPosition.y}px) scale(${mapScale})`,
           }}
         >
-          {/* Render landmarks */}
           {landmarks.map(landmark => (
             <div
               key={landmark.id}
@@ -922,7 +894,6 @@ const KeralaItinerary = () => {
             </div>
           ))}
           
-          {/* Render mini games */}
           {miniGames.map(game => (
             <div
               key={game.id}
@@ -945,7 +916,6 @@ const KeralaItinerary = () => {
             </div>
           ))}
           
-          {/* Render player */}
           <div
             className="absolute transition-all duration-200"
             style={{
@@ -970,7 +940,6 @@ const KeralaItinerary = () => {
         </div>
       </div>
       
-      {/* Game UI */}
       <div className="absolute top-4 left-4 z-30">
         <Button
           className="bg-slate-800/70 hover:bg-slate-700/70"
@@ -981,7 +950,6 @@ const KeralaItinerary = () => {
         </Button>
       </div>
       
-      {/* Information panel */}
       <div className="absolute bottom-4 left-4 w-72 z-30">
         <AnimatePresence mode="wait">
           {activeLandmark && (
@@ -1048,7 +1016,6 @@ const KeralaItinerary = () => {
         </AnimatePresence>
       </div>
       
-      {/* Controls */}
       {!playingGame && renderControls()}
     </div>
   );
