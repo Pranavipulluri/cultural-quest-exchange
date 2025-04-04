@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, TreePalm, Image, Gamepad, Waves, ChevronLeft, ChevronRight, Flag } from "lucide-react";
@@ -309,7 +308,7 @@ const KeralaItinerary = () => {
     
     if ('touches' in event) {
       clientX = event.touches[0].clientX;
-      clientY = event.touches[0].clientY;
+      clientY = event.clientY;
     } else {
       clientX = event.clientX;
       clientY = event.clientY;
@@ -570,45 +569,33 @@ const KeralaItinerary = () => {
       return renderBoatRace();
     } else if (activeGame.id === 1) {
       return (
-        <motion.div 
-          className="p-4 bg-slate-800 rounded-lg"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          exit={{ opacity: 0, scale: 0.9 }}
-          transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        >
+        <div className="p-4 bg-slate-800 rounded-lg">
           <h3 className="text-xl font-bold text-white mb-4">Village Quiz</h3>
           <p className="text-gray-300 mb-4">What is this village known for?</p>
           <div className="grid grid-cols-1 gap-2">
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            <div>
               <Button onClick={endGame} className="w-full justify-start">A) Fishing</Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            </div>
+            <div>
               <Button onClick={endGame} className="w-full justify-start">B) Farming</Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            </div>
+            <div>
               <Button onClick={endGame} className="w-full justify-start">C) Trading</Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+            </div>
+            <div>
               <Button onClick={endGame} className="w-full justify-start">D) Mining</Button>
-            </motion.div>
+            </div>
           </div>
-        </motion.div>
+        </div>
       );
     }
     
     return (
-      <motion.div 
-        className="p-4 bg-slate-800 rounded-lg"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      >
+      <div className="p-4 bg-slate-800 rounded-lg">
         <h3 className="text-xl font-bold text-white mb-4">{activeGame.name}</h3>
         <p className="text-gray-300 mb-4">{activeGame.description}</p>
         <Button onClick={endGame} className="w-full">Complete Game</Button>
-      </motion.div>
+      </div>
     );
   };
 
@@ -616,36 +603,20 @@ const KeralaItinerary = () => {
     if (!showNpcDialog) return null;
     
     return (
-      <motion.div 
-        className="p-6 bg-slate-800/95 rounded-lg border-2 border-teal-800/70"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      >
+      <div className="p-6 bg-slate-800/95 rounded-lg border-2 border-teal-800/70">
         <div className="flex items-start gap-4">
           <div className="rounded-full bg-teal-700 p-2 flex-shrink-0">
             <Waves className="h-6 w-6 text-white" />
           </div>
           
           <div className="flex-1">
-            <motion.h3 
-              className="text-lg font-bold text-teal-300 mb-2"
-              initial={{ y: -10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.1 }}
-            >
+            <h3 className="text-lg font-bold text-teal-300 mb-2">
               Kerala Boat Race Guide
-            </motion.h3>
+            </h3>
             
-            <motion.p 
-              className="text-white mb-4"
-              initial={{ y: 10, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
+            <p className="text-white mb-4">
               {npcDialogs[dialogStep]}
-            </motion.p>
+            </p>
             
             <div className="flex justify-end">
               <Button 
@@ -657,7 +628,7 @@ const KeralaItinerary = () => {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     );
   };
 
@@ -670,13 +641,7 @@ const KeralaItinerary = () => {
     }
     
     return (
-      <motion.div 
-        className="p-4 bg-slate-800 rounded-lg border-2 border-blue-900/50"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      >
+      <div className="p-4 bg-slate-800 rounded-lg border-2 border-blue-900/50">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-xl font-bold text-white">Kerala Chundan Vallam Race</h3>
           <Button 
@@ -715,7 +680,7 @@ const KeralaItinerary = () => {
               {/* Water background animation */}
               <div className="absolute inset-0 flex">
                 {Array(20).fill(0).map((_, i) => (
-                  <motion.div 
+                  <div 
                     key={i}
                     className="h-1 bg-blue-400/20 rounded-full"
                     style={{ width: `${100/20}%` }}
@@ -809,428 +774,3 @@ const KeralaItinerary = () => {
                     
                     {/* CPU Boat interior */}
                     <div className={`absolute h-2 w-12 bg-gradient-to-b ${
-                      idx === 0 
-                      ? "from-blue-600 to-blue-900" 
-                      : idx === 1 
-                        ? "from-green-600 to-green-900" 
-                        : "from-purple-600 to-purple-900"
-                    } rounded-lg top-1 left-2 transform -skew-x-12`} />
-                    
-                    {/* CPU Rowers */}
-                    <div className="absolute top-0 left-3 w-8 flex justify-around">
-                      <motion.div 
-                        className="h-2 w-1 bg-red-600"
-                        animate={{ rotate: [0, 30, 0, -30, 0] }}
-                        transition={{ repeat: Infinity, duration: 0.3 + (idx * 0.05) }}
-                      />
-                      <motion.div 
-                        className="h-2 w-1 bg-red-600"
-                        animate={{ rotate: [0, -30, 0, 30, 0] }}
-                        transition={{ repeat: Infinity, duration: 0.3 + (idx * 0.05), delay: 0.1 }}
-                      />
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-              
-              {/* Obstacles */}
-              {boatRaceState.obstacles.map((obstacle, idx) => (
-                <div 
-                  key={`obstacle-${idx}`}
-                  className="absolute h-4 w-4 bg-red-500/70 rounded-full"
-                  style={{ 
-                    left: `${obstacle.position}%`, 
-                    top: `${obstacle.lane * 33 + 14}%` 
-                  }}
-                >
-                  <div className="absolute -inset-1 bg-red-500/30 rounded-full animate-pulse" />
-                </div>
-              ))}
-              
-              {/* Finish line */}
-              <div className="absolute h-full w-1 bg-white right-0 top-0 flex flex-col">
-                {Array(10).fill(0).map((_, i) => (
-                  <div 
-                    key={`finish-${i}`} 
-                    className={`h-[10%] w-full ${i % 2 === 0 ? 'bg-black' : 'bg-white'}`} 
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Paddle button and lane controls */}
-            <div className="flex justify-between items-center gap-4">
-              <div className="flex flex-col gap-2">
-                <Button 
-                  onClick={() => changeBoatLane(0)}
-                  variant={boatRaceState.playerLane === 0 ? "default" : "outline"}
-                  className={`px-3 py-1 ${boatRaceState.playerLane === 0 ? "bg-teal-600" : ""}`}
-                  disabled={boatRaceState.finished}
-                >
-                  Top Lane
-                </Button>
-                <Button 
-                  onClick={() => changeBoatLane(1)}
-                  variant={boatRaceState.playerLane === 1 ? "default" : "outline"}
-                  className={`px-3 py-1 ${boatRaceState.playerLane === 1 ? "bg-teal-600" : ""}`}
-                  disabled={boatRaceState.finished}
-                >
-                  Middle Lane
-                </Button>
-                <Button 
-                  onClick={() => changeBoatLane(2)}
-                  variant={boatRaceState.playerLane === 2 ? "default" : "outline"} 
-                  className={`px-3 py-1 ${boatRaceState.playerLane === 2 ? "bg-teal-600" : ""}`}
-                  disabled={boatRaceState.finished}
-                >
-                  Bottom Lane
-                </Button>
-              </div>
-              
-              <div className="flex-1 flex flex-col items-center gap-3">
-                {boatRaceState.finished ? (
-                  <div className="text-center">
-                    <h4 className="text-xl font-bold mb-2">
-                      {boatRaceState.crashedObstacle 
-                        ? "Your boat crashed!" 
-                        : boatRaceState.winner === 'player' 
-                          ? "Victory!" 
-                          : "Better luck next time!"}
-                    </h4>
-                    <Button onClick={resetBoatRace} className="bg-teal-600 hover:bg-teal-700">
-                      Race Again
-                    </Button>
-                  </div>
-                ) : (
-                  <>
-                    <div className="bg-slate-700 rounded-full h-3 w-full overflow-hidden">
-                      <div 
-                        className="h-full bg-teal-500 transition-all duration-100" 
-                        style={{ width: `${boatRaceState.playerSpeed / boatRaceState.maxSpeed * 100}%` }} 
-                      />
-                    </div>
-                    <motion.button
-                      whileTap={{ scale: 0.95 }}
-                      onClick={increaseBoatSpeed}
-                      disabled={boatRaceState.finished}
-                      className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-lg text-lg w-full disabled:opacity-50"
-                    >
-                      PADDLE!
-                    </motion.button>
-                    <p className="text-gray-300 text-sm">
-                      Tap repeatedly to increase speed!
-                    </p>
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </motion.div>
-    );
-  };
-
-  return (
-    <div className="h-[70vh] relative">
-      {showInstructions && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="bg-slate-800 p-6 rounded-lg text-white max-w-md border-2 border-teal-500/30">
-            <h3 className="font-bold text-xl mb-4">Welcome to Kerala Explorer!</h3>
-            <p className="mb-3">Use arrow keys or directional buttons to navigate through Kerala village.</p>
-            <p className="mb-3">Approach landmarks to learn about them or mini-games to play.</p>
-            <p className="mb-5">Don't miss the fun boat race by the pond!</p>
-            <Button 
-              onClick={() => setShowInstructions(false)}
-              className="w-full bg-teal-600 hover:bg-teal-700"
-            >
-              Start Exploring!
-            </Button>
-          </div>
-        </div>
-      )}
-      
-      <div 
-        className="h-full relative overflow-hidden"
-        ref={mapContainerRef}
-        onWheel={handleZoom}
-        onMouseDown={handleMapDragStart}
-        onMouseMove={handleMapDragMove}
-        onMouseUp={handleMapDragEnd}
-        onMouseLeave={handleMapDragEnd}
-        onTouchStart={handleMapDragStart}
-        onTouchMove={handleMapDragMove}
-        onTouchEnd={handleMapDragEnd}
-      >
-        <div 
-          ref={mapRef}
-          className="absolute"
-          style={{
-            transform: `translate(${mapPosition.x}px, ${mapPosition.y}px) scale(${mapScale})`,
-            transformOrigin: 'center',
-            transition: isDragging ? 'none' : 'transform 0.3s ease-out'
-          }}
-        >
-          {/* Map background with Kerala style */}
-          <div className="relative rounded-xl overflow-hidden w-[1000px] h-[1000px]">
-            <div className="absolute inset-0 bg-gradient-to-br from-green-900 via-green-700 to-green-800" />
-            
-            {/* Water bodies */}
-            <div className="absolute bottom-0 right-0 h-[400px] w-[500px] bg-blue-900/70 rounded-tl-[200px]">
-              <div className="absolute inset-0 flex flex-wrap overflow-hidden">
-                {Array(30).fill(0).map((_, i) => (
-                  <motion.div 
-                    key={i}
-                    className="h-3 bg-blue-500/10 rounded-full m-[2px]"
-                    style={{ width: '7%' }}
-                    animate={{ y: [0, 3, 0] }}
-                    transition={{ 
-                      repeat: Infinity, 
-                      duration: 2, 
-                      delay: i * 0.04 % 0.5 
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-            
-            {/* Palm trees */}
-            <div className="absolute top-20 left-40">
-              <TreePalm className="h-16 w-16 text-green-500" />
-            </div>
-            <div className="absolute top-60 left-20">
-              <TreePalm className="h-14 w-14 text-green-600" />
-            </div>
-            <div className="absolute top-30 right-40">
-              <TreePalm className="h-16 w-16 text-green-500" />
-            </div>
-            <div className="absolute top-[500px] left-[120px]">
-              <TreePalm className="h-16 w-16 text-green-500" />
-            </div>
-            <div className="absolute bottom-[200px] right-[300px]">
-              <TreePalm className="h-16 w-16 text-green-600" />
-            </div>
-            
-            {/* Paths */}
-            <div className="absolute h-[700px] w-8 bg-amber-200/40 left-[400px] top-[150px] rounded-full" />
-            <div className="absolute h-8 w-[500px] bg-amber-200/40 left-[250px] top-[500px] rounded-full" />
-            <div className="absolute h-8 w-[200px] bg-amber-200/40 left-[400px] top-[150px] rounded-full" />
-            <div className="absolute h-[250px] w-8 bg-amber-200/40 left-[600px] top-[150px] rounded-full" />
-            <div className="absolute h-8 w-[300px] bg-amber-200/40 left-[600px] top-[400px] rounded-full" />
-            
-            {/* Landmark markers */}
-            {landmarks.map(landmark => (
-              <div 
-                key={landmark.id}
-                className="absolute flex flex-col items-center"
-                style={{ top: landmark.y - 25, left: landmark.x - 10 }}
-              >
-                <motion.div 
-                  initial={{ y: 0 }}
-                  animate={{ y: [-2, 2, -2] }} 
-                  transition={{ repeat: Infinity, duration: 2 }}
-                >
-                  <MapPin className="h-8 w-8 text-red-500 drop-shadow-lg" />
-                </motion.div>
-                <div className="text-[10px] font-bold text-white bg-slate-800/70 px-2 py-0.5 rounded mt-1 whitespace-nowrap">
-                  {landmark.name}
-                </div>
-              </div>
-            ))}
-            
-            {/* Mini game markers */}
-            {miniGames.map(game => (
-              <div 
-                key={game.id}
-                className="absolute flex flex-col items-center"
-                style={{ top: game.y - 20, left: game.x - 10 }}
-              >
-                <motion.div 
-                  initial={{ rotate: 0 }}
-                  animate={{ rotate: [0, 5, 0, -5, 0] }} 
-                  transition={{ repeat: Infinity, duration: 3 }}
-                >
-                  {game.id === 5 ? (
-                    <Waves className="h-8 w-8 text-blue-400 drop-shadow-lg" />
-                  ) : game.id === 3 ? (
-                    <Waves className="h-8 w-8 text-blue-400 drop-shadow-lg" />
-                  ) : (
-                    <Gamepad className="h-8 w-8 text-purple-400 drop-shadow-lg" />
-                  )}
-                </motion.div>
-                <div className="text-[10px] font-bold text-white bg-slate-800/70 px-2 py-0.5 rounded mt-1 whitespace-nowrap">
-                  {game.name}
-                </div>
-              </div>
-            ))}
-            
-            {/* Player character */}
-            <div 
-              className="absolute transition-all duration-100 h-12 w-12 flex items-center justify-center"
-              style={{ 
-                top: playerPosition.y - (CHARACTER_SIZE / 2),
-                left: playerPosition.x - (CHARACTER_SIZE / 2)
-              }}
-            >
-              <motion.div 
-                className="h-full w-full"
-                animate={{
-                  y: [0, -2, 0]
-                }}
-                transition={{
-                  repeat: Infinity,
-                  duration: 1
-                }}
-              >
-                <div className={`h-full w-full ${
-                  playerDirection === Direction.UP 
-                    ? "rotate-0" 
-                    : playerDirection === Direction.RIGHT 
-                      ? "rotate-90" 
-                      : playerDirection === Direction.DOWN 
-                        ? "rotate-180" 
-                        : "-rotate-90"
-                } transition-transform duration-150`}>
-                  <div className="h-full w-full bg-blue-500 rounded-full relative flex items-center justify-center">
-                    <div className="absolute top-1 -right-1 w-4 h-4 bg-blue-700 rounded-full" />
-                    <div className="h-1/2 w-1/2 bg-white rounded-full" />
-                  </div>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      {/* Landmark or Game Info Card */}
-      <AnimatePresence>
-        {activeLandmark && (
-          <motion.div 
-            className="absolute bottom-4 left-4 w-64 bg-slate-800/90 rounded-lg overflow-hidden border border-teal-500/30"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            <img 
-              src={activeLandmark.image} 
-              alt={activeLandmark.name} 
-              className="w-full h-32 object-cover"
-            />
-            <div className="p-3">
-              <h3 className="font-bold text-white">{activeLandmark.name}</h3>
-              <p className="text-sm text-gray-300 mt-1">{activeLandmark.description}</p>
-              <div className="flex justify-end mt-2">
-                <Button 
-                  variant="outline"
-                  size="sm" 
-                  onClick={() => setActiveLandmark(null)}
-                  className="text-gray-400 hover:text-white text-xs"
-                >
-                  Close
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-        
-        {activeGame && !playingGame && (
-          <motion.div 
-            className="absolute bottom-4 left-4 w-64 bg-slate-800/90 rounded-lg overflow-hidden border border-teal-500/30"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            <div className="h-32 bg-gradient-to-br from-purple-900 to-indigo-900 flex items-center justify-center">
-              {activeGame.id === 5 ? (
-                <Waves className="h-16 w-16 text-blue-300 opacity-80" />
-              ) : (
-                <Gamepad className="h-16 w-16 text-purple-300 opacity-80" />
-              )}
-            </div>
-            <div className="p-3">
-              <h3 className="font-bold text-white">{activeGame.name}</h3>
-              <p className="text-sm text-gray-300 mt-1">{activeGame.description}</p>
-              <div className="flex justify-between mt-2">
-                <Button 
-                  variant="outline"
-                  size="sm" 
-                  onClick={() => setActiveGame(null)}
-                  className="text-gray-400 hover:text-white text-xs"
-                >
-                  Close
-                </Button>
-                <Button 
-                  size="sm" 
-                  onClick={startGame}
-                  className="bg-purple-600 hover:bg-purple-700 text-white text-xs"
-                >
-                  Play Game
-                </Button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Mini Game Modal */}
-      <AnimatePresence>
-        {activeGame && playingGame && (
-          <motion.div 
-            className="absolute inset-0 flex items-center justify-center bg-black/60 z-40"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div 
-              className="w-full max-w-lg mx-4"
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              transition={{ type: "spring", stiffness: 300, damping: 30 }}
-            >
-              {renderMiniGame()}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Mobile controls */}
-      {!playingGame && renderControls()}
-      
-      {/* Map navigation buttons */}
-      <div className="absolute top-4 left-4 flex gap-2">
-        <Button 
-          onClick={centerMapOnPlayer}
-          className="bg-slate-700/70 hover:bg-slate-600/70"
-          disabled={playingGame}
-        >
-          Center Map
-        </Button>
-      </div>
-      
-      {/* Landmarks navigation list */}
-      <div className="absolute top-4 right-4">
-        <div className="w-48 bg-slate-800/80 rounded-lg p-3 border border-teal-500/30">
-          <h3 className="font-bold text-white text-sm mb-2">Kerala Landmarks</h3>
-          <div className="space-y-1 max-h-40 overflow-y-auto pr-1">
-            {landmarks.map(landmark => (
-              <Button 
-                key={landmark.id}
-                variant="ghost"
-                size="sm"
-                className="w-full justify-start text-gray-300 hover:text-white text-xs py-1 h-auto"
-                onClick={() => navigateToLandmark(landmark)}
-              >
-                <MapPin className="h-3 w-3 mr-1" />
-                {landmark.name}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default KeralaItinerary;
