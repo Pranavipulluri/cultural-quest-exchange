@@ -8,7 +8,7 @@ import KeralaItinerary from "@/components/KeralaItinerary";
 import { 
   Globe, Compass, Calendar, 
   Map as MapIcon, Info, X,
-  Users, Waves
+  Users, Waves, Music, Brain, Utensils
 } from "lucide-react";
 
 const Exploration = () => {
@@ -150,10 +150,10 @@ const Exploration = () => {
               >
                 <h2 className="text-xl font-bold text-white mb-4 flex items-center">
                   <Calendar className="h-5 w-5 text-teal-400 mr-2" />
-                  Featured Cultural Experiences
+                  Featured Kerala Cultural Experiences
                 </h2>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* Onam Boat Race Card */}
                   <motion.div 
                     whileHover={{ y: -5 }} 
@@ -191,7 +191,7 @@ const Exploration = () => {
                     </Card>
                   </motion.div>
                   
-                  {/* Other cultural experience card */}
+                  {/* Kathakali Dance */}
                   <motion.div 
                     whileHover={{ y: -5 }} 
                     className="rounded-xl overflow-hidden"
@@ -208,15 +208,55 @@ const Exploration = () => {
                           <div className="absolute bottom-0 left-0 w-full p-4">
                             <div className="flex items-center justify-between">
                               <div>
-                                <h3 className="text-xl font-bold text-white">Kathakali Dance</h3>
+                                <h3 className="text-xl font-bold text-white flex items-center">
+                                  <Music className="h-5 w-5 text-purple-400 mr-2" />
+                                  Kathakali Dance
+                                </h3>
                                 <p className="text-gray-300 text-sm">Classical Kerala dance-drama</p>
                               </div>
                               <Button 
                                 size="sm" 
                                 className="bg-purple-600 hover:bg-purple-700"
-                                onClick={() => {}}
+                                onClick={() => setShowItinerary(true)}
                               >
-                                Coming Soon
+                                Experience
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                  
+                  {/* Kerala Spice Trail */}
+                  <motion.div 
+                    whileHover={{ y: -5 }} 
+                    className="rounded-xl overflow-hidden"
+                  >
+                    <Card className="bg-gradient-to-br from-red-900/40 to-slate-800/80 border-red-500/30 h-full">
+                      <CardContent className="p-0">
+                        <div className="relative h-48 overflow-hidden">
+                          <img 
+                            src="/lovable-uploads/42770aa5-b929-4ed2-85e0-aa5a9b17ac5b.png" 
+                            alt="Kerala Spices" 
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
+                          <div className="absolute bottom-0 left-0 w-full p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-xl font-bold text-white flex items-center">
+                                  <Utensils className="h-5 w-5 text-red-400 mr-2" />
+                                  Spice Trail
+                                </h3>
+                                <p className="text-gray-300 text-sm">Explore Kerala's spice heritage</p>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                className="bg-red-600 hover:bg-red-700"
+                                onClick={() => setShowItinerary(true)}
+                              >
+                                Experience
                               </Button>
                             </div>
                           </div>
@@ -237,13 +277,42 @@ const Exploration = () => {
                   <CardContent className="p-4">
                     <div className="flex items-center mb-4">
                       <Calendar className="h-6 w-6 text-teal-400 mr-3" />
-                      <h2 className="text-xl font-bold text-white">Upcoming Cultural Events</h2>
+                      <h2 className="text-xl font-bold text-white">Upcoming Kerala Cultural Events</h2>
                     </div>
                     
-                    <div className="bg-slate-700/50 rounded-lg p-4 text-center">
-                      <Info className="h-10 w-10 mx-auto text-teal-400 mb-2" />
-                      <p className="text-white">Browse through regions and countries to see their unique cultural events and festivals</p>
-                      <p className="text-gray-400 text-sm mt-2">Select a region, country, or state from the map above to view related cultural events</p>
+                    <div className="bg-slate-700/50 rounded-lg p-4">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-slate-800/70 p-3 rounded-lg border border-teal-500/20">
+                          <h4 className="font-semibold text-white mb-1">Onam Festival</h4>
+                          <p className="text-sm text-gray-300">Celebrate Kerala's harvest festival with traditional dances, boat races, and feasts</p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-gray-400">August 20-29</span>
+                            <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowItinerary(true)}>
+                              Visit in Explorer
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="bg-slate-800/70 p-3 rounded-lg border border-teal-500/20">
+                          <h4 className="font-semibold text-white mb-1">Theyyam Season</h4>
+                          <p className="text-sm text-gray-300">Witness the ancient ritual art form with elaborate costumes and sacred performances</p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-gray-400">October-May</span>
+                            <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowItinerary(true)}>
+                              Visit in Explorer
+                            </Button>
+                          </div>
+                        </div>
+                        <div className="bg-slate-800/70 p-3 rounded-lg border border-teal-500/20">
+                          <h4 className="font-semibold text-white mb-1">Kerala Arts Festival</h4>
+                          <p className="text-sm text-gray-300">Experience traditional art forms including Kathakali, Mohiniyattam, and Kalaripayattu</p>
+                          <div className="flex justify-between items-center mt-2">
+                            <span className="text-xs text-gray-400">November 15-20</span>
+                            <Button size="sm" variant="outline" className="text-xs h-7" onClick={() => setShowItinerary(true)}>
+                              Visit in Explorer
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </CardContent>
                 </Card>
@@ -256,7 +325,6 @@ const Exploration = () => {
   );
 };
 
-// Community Hub Component
 const CommunityHub = ({ onClose }: { onClose: () => void }) => {
   const players = [
     { id: 1, name: "Arjun", avatar: "/lovable-uploads/d364c15d-f877-40f4-9df2-cad09b0ec8a2.png", level: 12, points: 1240, badge: "Kerala Expert" },

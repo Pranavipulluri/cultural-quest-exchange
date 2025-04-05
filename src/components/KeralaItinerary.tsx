@@ -1,7 +1,11 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, MapPin, TreePalm, Image, Gamepad, Waves, ChevronLeft, ChevronRight, Flag } from "lucide-react";
+import { Popover, PopoverTrigger, NPCPopoverContent } from "@/components/ui/popover";
+import { 
+  ArrowLeft, MapPin, TreePalm, Image, Gamepad, Waves, 
+  ChevronLeft, ChevronRight, Flag, Music, Utensils, Brain
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -71,24 +75,39 @@ const landmarks = [
 const miniGames = [
   {
     id: 1,
-    name: "Village Quiz",
+    name: "Kerala Culture Quiz",
     x: 500,
     y: 350,
-    description: "Test your knowledge about the village and its surroundings.",
+    description: "Test your knowledge about Kerala culture and traditions.",
+    icon: <Brain className="w-4 h-4 text-white" />,
+    color: "bg-blue-600",
+    npcAvatar: "/lovable-uploads/49a90938-ee32-4179-97cf-28ed0bbecc51.png", 
+    npcName: "Professor Rajan",
+    npcMessage: "Namaskaram! I'm Professor Rajan. Kerala has a rich cultural heritage spanning thousands of years. This quiz will test your knowledge about our traditions, art forms, and customs. Did you know that Kerala has over 600 Ayurvedic medicinal plants? Let's see how much you know about our beautiful state!"
   },
   {
     id: 2,
-    name: "Memory Match",
-    x: 780,
-    y: 320,
-    description: "Match pairs of village items in this memory game.",
+    name: "Kathakali Memory Match",
+    x: 380,
+    y: 520,
+    description: "Match pairs of Kathakali dance expressions in this memory game.",
+    icon: <Music className="w-4 h-4 text-white" />,
+    color: "bg-purple-600",
+    npcAvatar: "/lovable-uploads/49a90938-ee32-4179-97cf-28ed0bbecc51.png",
+    npcName: "Guru Menon",
+    npcMessage: "Namaskaram! I am Guru Menon, a Kathakali artist. Kathakali is a classical dance form that originated in Kerala over 400 years ago. It combines dance, music, colorful makeup, and elaborate costumes to tell stories from Hindu epics. There are nine basic facial expressions we use called 'Navarasas' - can you match them all in this memory game?"
   },
   {
     id: 3,
     name: "Fishing Game",
     x: 550,
     y: 650,
-    description: "Try to catch fish from the village pond.",
+    description: "Try to catch fish from the village pond using traditional techniques.",
+    icon: <MapPin className="w-4 h-4 text-white" />,
+    color: "bg-blue-500",
+    npcAvatar: "/lovable-uploads/49a90938-ee32-4179-97cf-28ed0bbecc51.png",
+    npcName: "Fisherman Antony",
+    npcMessage: "Hello there! I'm Antony from the fishing community of Kerala. Fishing is an ancient tradition here, and it's still an important part of our livelihood. We use unique fishing techniques like 'Cheena vala' (Chinese nets) that were introduced by Chinese explorers centuries ago. Try your hand at catching some fish using our traditional methods!"
   },
   {
     id: 4,
@@ -96,6 +115,11 @@ const miniGames = [
     x: 600,
     y: 250,
     description: "Help gather crops from the local farm with this Mahjong game.",
+    icon: <Utensils className="w-4 h-4 text-white" />,
+    color: "bg-green-600",
+    npcAvatar: "/lovable-uploads/49a90938-ee32-4179-97cf-28ed0bbecc51.png",
+    npcName: "Farmer Lakshmi",
+    npcMessage: "Namaskaram! I'm Lakshmi, and my family has been farming in Kerala for generations. Rice is our main crop, especially the famous 'Kaima' and 'Jeerakasala' varieties. Our farming is closely tied to our festivals - Vishu celebrates the agricultural new year, and we have songs called 'Vanchipattu' that we sing while working in the fields. Help me match and harvest the crops in this game!"
   },
   {
     id: 5,
@@ -103,7 +127,36 @@ const miniGames = [
     x: 650,
     y: 620,
     description: "Race traditional boats through the Kerala backwaters during Onam festival.",
-    featured: true
+    icon: <Waves className="w-4 h-4 text-white" />,
+    color: "bg-yellow-500",
+    featured: true,
+    npcAvatar: "/lovable-uploads/49a90938-ee32-4179-97cf-28ed0bbecc51.png",
+    npcName: "Captain Unnikrishnan",
+    npcMessage: "Namaskaram! I'm Unnikrishnan, captain of our village's boat race team. The Vallam Kali (boat race) is a spectacular part of the Onam festival celebrating the return of King Mahabali. Our snake boats, called 'Chundan Vallam', are over 100 feet long and carry up to 100 rowers! The rhythmic 'Vanchipattu' songs power our oars. Are you ready to experience the thrill of Kerala's most exciting water sport?"
+  },
+  {
+    id: 6,
+    name: "Spice Sorting",
+    x: 750,
+    y: 430,
+    description: "Sort and identify famous Kerala spices in this fast-paced puzzle game.",
+    icon: <Utensils className="w-4 h-4 text-white" />,
+    color: "bg-red-600",
+    npcAvatar: "/lovable-uploads/49a90938-ee32-4179-97cf-28ed0bbecc51.png",
+    npcName: "Spice Merchant Fathima",
+    npcMessage: "Namaskaram! I'm Fathima, a spice merchant from the hills of Kerala. Did you know that Kerala has been the center of spice trade for over 3000 years? Our black pepper was once so valuable it was called 'black gold'! We also grow cardamom, cinnamon, cloves, and many other spices that give Kerala cuisine its distinctive flavor. Try sorting these precious spices in my shop!"
+  },
+  {
+    id: 7,
+    name: "Theyyam Rhythm",
+    x: 280,
+    y: 280,
+    description: "Match the beats of this ancient ritual performance in this rhythm game.",
+    icon: <Music className="w-4 h-4 text-white" />,
+    color: "bg-orange-600",
+    npcAvatar: "/lovable-uploads/49a90938-ee32-4179-97cf-28ed0bbecc51.png",
+    npcName: "Theyyam Performer Krishnan",
+    npcMessage: "Namaskaram! I am Krishnan, a Theyyam artist. Theyyam is an ancient ritual art form of North Kerala where performers become divine incarnations through elaborate costumes and makeup. There are over 400 forms of Theyyam, each with unique rhythms, movements, and stories. Our performances often last through the night and are believed to bring blessings to the village. Try to match the sacred rhythms in this game!"
   }
 ];
 
@@ -113,6 +166,60 @@ enum Direction {
   LEFT,
   RIGHT,
 }
+
+const NPCCharacter = ({ 
+  avatar, 
+  name, 
+  message, 
+  position = "left",
+  isOpen,
+  onOpenChange
+}: { 
+  avatar: string; 
+  name: string; 
+  message: string; 
+  position?: "left" | "right";
+  isOpen: boolean;
+  onOpenChange: (open: boolean) => void;
+}) => {
+  return (
+    <Popover open={isOpen} onOpenChange={onOpenChange}>
+      <PopoverTrigger asChild>
+        <motion.div 
+          className={`absolute bottom-0 ${position === "left" ? "left-2" : "right-2"} cursor-pointer z-30`}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          animate={{ y: [0, -5, 0] }}
+          transition={{ repeat: Infinity, duration: 2 }}
+        >
+          <div className="relative">
+            <img 
+              src={avatar} 
+              alt={name} 
+              className="h-24 object-contain"
+            />
+            <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 bg-slate-900/80 text-white text-xs px-2 py-0.5 rounded whitespace-nowrap">
+              {name}
+            </div>
+          </div>
+        </motion.div>
+      </PopoverTrigger>
+      <NPCPopoverContent characterSide={position}>
+        <h4 className="text-lg font-bold text-yellow-400 mb-2">{name}</h4>
+        <p className="text-white">{message}</p>
+        <div className="mt-3 text-right">
+          <Button 
+            size="sm" 
+            className="bg-yellow-600 hover:bg-yellow-700"
+            onClick={() => onOpenChange(false)}
+          >
+            Continue
+          </Button>
+        </div>
+      </NPCPopoverContent>
+    </Popover>
+  );
+};
 
 const KeralaItinerary = () => {
   const [playerPosition, setPlayerPosition] = useState({ x: 500, y: 400 });
@@ -125,6 +232,7 @@ const KeralaItinerary = () => {
   const [mapPosition, setMapPosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [showNpcDialog, setShowNpcDialog] = useState(false);
   const [boatRaceState, setBoatRaceState] = useState({
     started: false,
     playerPosition: 0,
@@ -218,6 +326,7 @@ const KeralaItinerary = () => {
     if (foundGame) {
       setActiveGame(foundGame);
       setActiveLandmark(null);
+      setShowNpcDialog(true);
       return;
     }
     
@@ -315,9 +424,31 @@ const KeralaItinerary = () => {
     setActiveGame(null);
   };
 
+  const navigateToGame = (game: typeof miniGames[0]) => {
+    setPlayerPosition({
+      x: game.x,
+      y: game.y
+    });
+    
+    if (mapContainerRef.current) {
+      const containerWidth = mapContainerRef.current.clientWidth;
+      const containerHeight = mapContainerRef.current.clientHeight;
+      
+      setMapPosition({
+        x: containerWidth / 2 - game.x * mapScale,
+        y: containerHeight / 2 - game.y * mapScale
+      });
+    }
+    
+    setActiveGame(game);
+    setActiveLandmark(null);
+    setShowNpcDialog(true);
+  };
+
   const startGame = () => {
     if (activeGame) {
       setPlayingGame(true);
+      setShowNpcDialog(false);
       toast.success(`Starting ${activeGame.name}!`);
     }
   };
@@ -470,20 +601,20 @@ const KeralaItinerary = () => {
           exit={{ opacity: 0, scale: 0.9 }}
           transition={{ type: "spring", stiffness: 300, damping: 25 }}
         >
-          <h3 className="text-xl font-bold text-white mb-4">Village Quiz</h3>
-          <p className="text-gray-300 mb-4">What is this village known for?</p>
+          <h3 className="text-xl font-bold text-white mb-4">Kerala Culture Quiz</h3>
+          <p className="text-gray-300 mb-4">What is the state flower of Kerala?</p>
           <div className="grid grid-cols-1 gap-2">
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button onClick={endGame} className="w-full justify-start">A) Fishing</Button>
+              <Button onClick={endGame} className="w-full justify-start">A) Jasmine</Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button onClick={endGame} className="w-full justify-start">B) Farming</Button>
+              <Button onClick={endGame} className="w-full justify-start bg-green-600 hover:bg-green-700">B) Golden Shower (Kanikkonna)</Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button onClick={endGame} className="w-full justify-start">C) Trading</Button>
+              <Button onClick={endGame} className="w-full justify-start">C) Lotus</Button>
             </motion.div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-              <Button onClick={endGame} className="w-full justify-start">D) Mining</Button>
+              <Button onClick={endGame} className="w-full justify-start">D) Sunflower</Button>
             </motion.div>
           </div>
         </motion.div>
@@ -512,6 +643,242 @@ const KeralaItinerary = () => {
           
           <div className="bg-white rounded-lg p-2 overflow-hidden">
             <div dangerouslySetInnerHTML={{ __html: '<div><script src="https://cdn.htmlgames.com/embed.js?game=FarmMahjong&bgcolor=white"></script></div>' }} />
+          </div>
+        </motion.div>
+      );
+    } else if (activeGame.id === 2) {
+      // Kathakali Memory Match
+      return (
+        <motion.div 
+          className="p-4 bg-slate-800 rounded-lg"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-white">Kathakali Memory Match</h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={endGame}
+              className="text-gray-400 hover:text-white"
+            >
+              Exit Game
+            </Button>
+          </div>
+          
+          <div className="grid grid-cols-4 gap-2 mb-4">
+            {Array(16).fill(0).map((_, i) => (
+              <motion.div 
+                key={i}
+                className="aspect-square bg-purple-800 rounded-md flex items-center justify-center cursor-pointer"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={endGame}
+              >
+                <span className="text-2xl">?</span>
+              </motion.div>
+            ))}
+          </div>
+          
+          <div className="text-center">
+            <p className="text-gray-300 mb-2">Match the Kathakali facial expressions</p>
+            <Button onClick={endGame} className="bg-purple-600 hover:bg-purple-700">
+              Complete Game
+            </Button>
+          </div>
+        </motion.div>
+      );
+    } else if (activeGame.id === 3) {
+      // Fishing Game
+      return (
+        <motion.div 
+          className="p-4 bg-slate-800 rounded-lg"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-white">Kerala Fishing Game</h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={endGame}
+              className="text-gray-400 hover:text-white"
+            >
+              Exit Game
+            </Button>
+          </div>
+          
+          <div className="relative h-48 bg-blue-900/50 rounded-lg overflow-hidden mb-4">
+            <div className="absolute inset-0 flex">
+              {Array(20).fill(0).map((_, i) => (
+                <motion.div 
+                  key={i}
+                  className="h-1 bg-blue-400/20 rounded-full"
+                  style={{ width: `${100/20}%` }}
+                  animate={{ y: [0, 5, 0] }}
+                  transition={{ 
+                    repeat: Infinity, 
+                    duration: 1.5, 
+                    delay: i * 0.1 % 0.5 
+                  }}
+                />
+              ))}
+            </div>
+            
+            {Array(5).fill(0).map((_, i) => (
+              <motion.div
+                key={i}
+                className="absolute w-8 h-4 bg-cyan-500 rounded-sm"
+                style={{
+                  left: `${Math.random() * 80 + 10}%`,
+                  top: `${Math.random() * 80 + 10}%`,
+                }}
+                animate={{
+                  x: [0, 20, 0, -20, 0],
+                  y: [0, 5, 0, -5, 0],
+                }}
+                transition={{
+                  repeat: Infinity,
+                  duration: 4 + Math.random() * 2,
+                  delay: i * 0.5,
+                }}
+              >
+                <div className="absolute right-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-cyan-300 rounded-full" />
+              </motion.div>
+            ))}
+            
+            <motion.div
+              className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1 h-16 bg-gray-400"
+              animate={{ height: [16, 40, 16] }}
+              transition={{ repeat: Infinity, duration: 2 }}
+            >
+              <div className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-4 h-1 bg-gray-300" />
+            </motion.div>
+          </div>
+          
+          <div className="text-center">
+            <Button 
+              onClick={endGame} 
+              className="bg-blue-600 hover:bg-blue-700 w-full py-3"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              as={motion.button}
+            >
+              Catch Fish
+            </Button>
+          </div>
+        </motion.div>
+      );
+    } else if (activeGame.id === 6) {
+      // Spice Sorting Game
+      return (
+        <motion.div 
+          className="p-4 bg-slate-800 rounded-lg"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-white">Spice Sorting Challenge</h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={endGame}
+              className="text-gray-400 hover:text-white"
+            >
+              Exit Game
+            </Button>
+          </div>
+          
+          <div className="flex flex-wrap gap-3 justify-center mb-6">
+            {["Cardamom", "Pepper", "Cinnamon", "Cloves", "Turmeric", "Ginger"].map((spice, index) => (
+              <motion.div
+                key={index}
+                className="bg-gradient-to-r from-amber-700 to-red-700 p-1 rounded-lg cursor-move"
+                drag
+                dragConstraints={{ left: -50, right: 50, top: -50, bottom: 50 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="px-3 py-1 bg-slate-800 rounded-md">
+                  {spice}
+                </div>
+              </motion.div>
+            ))}
+          </div>
+          
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="border-2 border-dashed border-amber-500/50 rounded-lg p-3 h-24 flex items-center justify-center">
+              <p className="text-amber-300 text-center">Drop aromatic spices here</p>
+            </div>
+            <div className="border-2 border-dashed border-red-500/50 rounded-lg p-3 h-24 flex items-center justify-center">
+              <p className="text-red-300 text-center">Drop spicy spices here</p>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <Button onClick={endGame} className="bg-amber-600 hover:bg-amber-700">
+              Complete Sorting
+            </Button>
+          </div>
+        </motion.div>
+      );
+    } else if (activeGame.id === 7) {
+      // Theyyam Rhythm Game
+      return (
+        <motion.div 
+          className="p-4 bg-slate-800 rounded-lg"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-white">Theyyam Rhythm Challenge</h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={endGame}
+              className="text-gray-400 hover:text-white"
+            >
+              Exit Game
+            </Button>
+          </div>
+          
+          <div className="relative h-24 bg-orange-900/30 rounded-lg mb-4 overflow-hidden">
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-orange-500" />
+            
+            {["A", "S", "D", "F"].map((key, i) => (
+              <div key={i} className="absolute bottom-1 h-12 w-12 flex items-center justify-center bg-slate-800 border-2 border-orange-500 rounded-lg" style={{ left: `${10 + i * 25}%` }}>
+                <span className="text-xl font-bold text-white">{key}</span>
+              </div>
+            ))}
+            
+            <motion.div 
+              className="absolute h-8 w-8 bg-orange-600 rounded-md flex items-center justify-center text-white font-bold"
+              initial={{ top: "-20%", left: "10%" }}
+              animate={{ top: "100%" }}
+              transition={{ duration: 2, ease: "linear" }}
+              onAnimationComplete={endGame}
+            >
+              A
+            </motion.div>
+          </div>
+          
+          <div className="text-center bg-slate-700/50 p-3 rounded-lg mb-4">
+            <p className="text-gray-300 mb-2">Press the keys when the notes align with the buttons!</p>
+            <p className="text-orange-300 text-xl">Score: 0</p>
+          </div>
+          
+          <div className="text-center">
+            <Button onClick={endGame} className="bg-orange-600 hover:bg-orange-700">
+              Complete Game
+            </Button>
           </div>
         </motion.div>
       );
@@ -711,7 +1078,7 @@ const KeralaItinerary = () => {
         <Button variant="ghost" className="mr-2" onClick={() => window.history.back()}>
           <ArrowLeft className="h-5 w-5 text-white" />
         </Button>
-        <h2 className="text-2xl font-bold text-white">Village Explorer</h2>
+        <h2 className="text-2xl font-bold text-white">Kerala Explorer</h2>
         
         <div className="ml-auto flex gap-2">
           <Button 
@@ -749,9 +1116,9 @@ const KeralaItinerary = () => {
         >
           <div className="flex justify-between items-start">
             <div>
-              <h3 className="text-lg font-semibold mb-2">Welcome to Village Explorer!</h3>
+              <h3 className="text-lg font-semibold mb-2">Welcome to Kerala Explorer!</h3>
               <p className="text-sm text-gray-300 mb-2">Use arrow keys or on-screen controls to move your character.</p>
-              <p className="text-sm text-gray-300">Visit landmarks and mini-games to discover village attractions.</p>
+              <p className="text-sm text-gray-300">Visit landmarks and mini-games to discover Kerala's rich cultural heritage.</p>
             </div>
             <Button 
               variant="ghost" 
@@ -861,18 +1228,15 @@ const KeralaItinerary = () => {
                           setPlayerPosition({ x: game.x, y: game.y });
                           setActiveGame(game);
                           setActiveLandmark(null);
+                          setShowNpcDialog(true);
                         }}
                       >
-                        <div className={`w-[24px] h-[24px] ${game.id === 5 ? 'bg-yellow-500' : 'bg-purple-500'} rounded-lg flex items-center justify-center`}>
-                          {game.id === 5 ? (
-                            <Waves className="w-4 h-4 text-white" />
-                          ) : (
-                            <Gamepad className="w-4 h-4 text-white" />
-                          )}
+                        <div className={`w-[24px] h-[24px] ${game.color} rounded-lg flex items-center justify-center`}>
+                          {game.icon}
                         </div>
                         <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-slate-800/90 text-white text-xs py-1 px-2 rounded mb-1">
                           {game.name}
-                          {game.id === 5 && (
+                          {game.featured && (
                             <span className="ml-1 text-yellow-300 text-xs">✨</span>
                           )}
                         </div>
@@ -922,12 +1286,23 @@ const KeralaItinerary = () => {
                 </div>
                 
                 <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-slate-900/30" />
+                
+                {activeGame && showNpcDialog && (
+                  <NPCCharacter 
+                    avatar={activeGame.npcAvatar}
+                    name={activeGame.npcName}
+                    message={activeGame.npcMessage}
+                    position="left"
+                    isOpen={showNpcDialog}
+                    onOpenChange={setShowNpcDialog}
+                  />
+                )}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
         
-        {/* Information Panel - Now displayed below the map */}
+        {/* Information Panel - Below the map */}
         <div className="mt-4">
           <AnimatePresence>
             {activeLandmark && !playingGame && (
@@ -975,7 +1350,7 @@ const KeralaItinerary = () => {
           </AnimatePresence>
           
           <AnimatePresence>
-            {activeGame && !playingGame && (
+            {activeGame && !playingGame && !showNpcDialog && (
               <motion.div 
                 key={`game-${activeGame.id}`}
                 className="mt-4 bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg text-white"
@@ -986,16 +1361,12 @@ const KeralaItinerary = () => {
               >
                 <div className="flex items-start gap-3">
                   <motion.div 
-                    className={`${activeGame.id === 5 ? 'bg-yellow-500' : 'bg-purple-500'} rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0`}
+                    className={`${activeGame.color} rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0`}
                     initial={{ rotate: -10, scale: 0.9 }}
                     animate={{ rotate: 0, scale: 1 }}
                     transition={{ type: "spring", stiffness: 200 }}
                   >
-                    {activeGame.id === 5 ? (
-                      <Waves className="h-5 w-5 text-white" />
-                    ) : (
-                      <Gamepad className="h-5 w-5 text-white" />
-                    )}
+                    {activeGame.icon}
                   </motion.div>
                   <div>
                     <motion.h3 
@@ -1023,7 +1394,7 @@ const KeralaItinerary = () => {
                     >
                       <Button 
                         onClick={startGame} 
-                        className={`${activeGame.id === 5 ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-purple-600 hover:bg-purple-700'}`}
+                        className={`${activeGame.color} hover:opacity-90`}
                       >
                         Play Game
                       </Button>
@@ -1045,18 +1416,39 @@ const KeralaItinerary = () => {
             <h3 className="text-white text-sm font-semibold mb-2 flex items-center">
               Quick Travel
             </h3>
-            <div className="flex flex-wrap gap-2">
-              {landmarks.map(landmark => (
-                <Button 
-                  key={landmark.id} 
-                  size="sm" 
-                  variant="outline" 
-                  className="text-xs"
-                  onClick={() => navigateToLandmark(landmark)}
-                >
-                  <MapPin className="h-3 w-3 mr-1" /> {landmark.name}
-                </Button>
-              ))}
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <h4 className="text-gray-300 text-xs mb-2">Landmarks</h4>
+                <div className="flex flex-wrap gap-2">
+                  {landmarks.slice(0, 4).map(landmark => (
+                    <Button 
+                      key={landmark.id} 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-xs"
+                      onClick={() => navigateToLandmark(landmark)}
+                    >
+                      <MapPin className="h-3 w-3 mr-1" /> {landmark.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <h4 className="text-gray-300 text-xs mb-2">Games</h4>
+                <div className="flex flex-wrap gap-2">
+                  {miniGames.slice(0, 3).map(game => (
+                    <Button 
+                      key={game.id} 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-xs"
+                      onClick={() => navigateToGame(game)}
+                    >
+                      <Gamepad className="h-3 w-3 mr-1" /> {game.name}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </div>
           </motion.div>
         )}
