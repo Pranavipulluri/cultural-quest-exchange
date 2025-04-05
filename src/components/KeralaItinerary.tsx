@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Popover, PopoverTrigger, NPCPopoverContent } from "@/components/ui/popover";
@@ -761,15 +760,14 @@ const KeralaItinerary = () => {
           </div>
           
           <div className="text-center">
-            <Button 
-              onClick={endGame} 
-              className="bg-blue-600 hover:bg-blue-700 w-full py-3"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              as={motion.button}
-            >
-              Catch Fish
-            </Button>
+            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+              <Button 
+                onClick={endGame} 
+                className="bg-blue-600 hover:bg-blue-700 w-full py-3"
+              >
+                Catch Fish
+              </Button>
+            </motion.div>
           </div>
         </motion.div>
       );
@@ -1053,10 +1051,7 @@ const KeralaItinerary = () => {
             ) : (
               <div>
                 <p className="text-gray-300 text-sm mb-3 text-center">Tap repeatedly to paddle faster!</p>
-                <motion.div 
-                  whileTap={{ scale: 0.95 }}
-                  className="w-full"
-                >
+                <motion.div whileTap={{ scale: 0.95 }} className="w-full">
                   <Button 
                     onClick={increaseBoatSpeed}
                     className="bg-teal-600 hover:bg-teal-700 w-full h-16 text-lg font-bold"
