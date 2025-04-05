@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, MapPin, TreePalm, Image, Gamepad, Waves, ChevronLeft, ChevronRight, Flag } from "lucide-react";
@@ -94,14 +95,15 @@ const miniGames = [
     name: "Farm Harvest",
     x: 600,
     y: 250,
-    description: "Help gather crops from the local farm.",
+    description: "Help gather crops from the local farm with this Mahjong game.",
   },
   {
     id: 5,
-    name: "Boat Race",
+    name: "Onam Boat Race",
     x: 650,
     y: 620,
-    description: "Race traditional boats through the Kerala backwaters.",
+    description: "Race traditional boats through the Kerala backwaters during Onam festival.",
+    featured: true
   }
 ];
 
@@ -486,6 +488,33 @@ const KeralaItinerary = () => {
           </div>
         </motion.div>
       );
+    } else if (activeGame.id === 4) {
+      // Farm Harvest Mahjong Game
+      return (
+        <motion.div 
+          className="p-4 bg-slate-800 rounded-lg"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.9 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-xl font-bold text-white">Farm Harvest Mahjong</h3>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={endGame}
+              className="text-gray-400 hover:text-white"
+            >
+              Exit Game
+            </Button>
+          </div>
+          
+          <div className="bg-white rounded-lg p-2 overflow-hidden">
+            <div dangerouslySetInnerHTML={{ __html: '<div><script src="https://cdn.htmlgames.com/embed.js?game=FarmMahjong&bgcolor=white"></script></div>' }} />
+          </div>
+        </motion.div>
+      );
     }
     
     return (
@@ -515,7 +544,7 @@ const KeralaItinerary = () => {
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
       >
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-bold text-white">Kerala Boat Race</h3>
+          <h3 className="text-xl font-bold text-white">Onam Boat Race</h3>
           <Button 
             variant="ghost" 
             size="sm" 
@@ -533,7 +562,7 @@ const KeralaItinerary = () => {
               alt="Boat Race" 
               className="w-full h-32 object-cover rounded-lg mb-4 opacity-70"
             />
-            <p className="text-gray-300 mb-6">Race your traditional boat through the Kerala backwaters. Tap rapidly to increase speed and avoid obstacles!</p>
+            <p className="text-gray-300 mb-6">Race your traditional boat through the Kerala backwaters during the Onam festival. Tap rapidly to increase speed and avoid obstacles!</p>
             <Button onClick={startBoatRace} className="bg-teal-600 hover:bg-teal-700">
               Start Race
             </Button>
@@ -736,290 +765,315 @@ const KeralaItinerary = () => {
         </motion.div>
       )}
 
-      <AnimatePresence mode="wait">
-        {playingGame ? (
-          <motion.div 
-            key="game-mode"
-            className="mt-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ duration: 0.3 }}
-          >
-            {renderMiniGame()}
-          </motion.div>
-        ) : (
-          <motion.div
-            key="map-mode"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="relative"
-          >
-            <div 
-              ref={mapContainerRef}
-              className="relative bg-green-800 rounded-lg overflow-hidden shadow-xl border border-teal-900/50 h-[60vh]" 
-              onWheel={handleZoom}
-              onMouseDown={handleMapDragStart}
-              onMouseMove={handleMapDragMove}
-              onMouseUp={handleMapDragEnd}
-              onMouseLeave={handleMapDragEnd}
-              onTouchStart={handleMapDragStart}
-              onTouchMove={handleMapDragMove}
-              onTouchEnd={handleMapDragEnd}
+      <div className="flex flex-col">
+        <AnimatePresence mode="wait">
+          {playingGame ? (
+            <motion.div 
+              key="game-mode"
+              className="w-full"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ duration: 0.3 }}
+            >
+              {renderMiniGame()}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="map-mode"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="relative"
             >
               <div 
-                ref={mapRef}
-                className="absolute origin-top-left transition-transform duration-200"
-                style={{ 
-                  transform: `scale(${mapScale})`,
-                  left: `${mapPosition.x}px`,
-                  top: `${mapPosition.y}px`,
-                }}
+                ref={mapContainerRef}
+                className="relative bg-green-800 rounded-lg overflow-hidden shadow-xl border border-teal-900/50 h-[50vh]" 
+                onWheel={handleZoom}
+                onMouseDown={handleMapDragStart}
+                onMouseMove={handleMapDragMove}
+                onMouseUp={handleMapDragEnd}
+                onMouseLeave={handleMapDragEnd}
+                onTouchStart={handleMapDragStart}
+                onTouchMove={handleMapDragMove}
+                onTouchEnd={handleMapDragEnd}
               >
-                <div className="relative">
-                  <img 
-                    src="/lovable-uploads/f55a5bc8-b4e5-446a-9803-84768ce13250.png" 
-                    alt="Village Map" 
-                    className="w-[1000px] h-[1000px] object-cover pixel-art"
-                    style={{ imageRendering: 'pixelated' }}
-                  />
-                  
-                  {landmarks.map(landmark => (
-                    <motion.div
-                      key={`landmark-${landmark.id}`}
-                      className="absolute cursor-pointer"
-                      style={{ 
-                        left: landmark.x - 12, 
-                        top: landmark.y - 12,
-                        zIndex: 10
-                      }}
-                      whileHover={{ scale: 1.2 }}
-                      animate={{ 
-                        scale: [1, 1.1, 1],
-                      }}
-                      transition={{ repeat: Infinity, duration: 2 }}
-                      onClick={() => navigateToLandmark(landmark)}
-                    >
-                      <div className="w-[24px] h-[24px] bg-red-500 rounded-full flex items-center justify-center">
-                        <MapPin className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-slate-800/90 text-white text-xs py-1 px-2 rounded mb-1">
-                        {landmark.name}
-                      </div>
-                    </motion.div>
-                  ))}
-                  
-                  {miniGames.map(game => (
-                    <motion.div
-                      key={`game-${game.id}`}
-                      className="absolute cursor-pointer"
-                      style={{ 
-                        left: game.x - 12, 
-                        top: game.y - 12,
-                        zIndex: 10
-                      }}
-                      whileHover={{ scale: 1.2 }}
-                      animate={{ 
-                        rotate: [0, 10, -10, 0],
-                      }}
-                      transition={{ repeat: Infinity, duration: 3 }}
-                      onClick={() => {
-                        setPlayerPosition({ x: game.x, y: game.y });
-                        setActiveGame(game);
-                        setActiveLandmark(null);
-                      }}
-                    >
-                      <div className="w-[24px] h-[24px] bg-purple-500 rounded-lg flex items-center justify-center">
-                        <Gamepad className="w-4 h-4 text-white" />
-                      </div>
-                      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-slate-800/90 text-white text-xs py-1 px-2 rounded mb-1">
-                        {game.name}
-                      </div>
-                    </motion.div>
-                  ))}
-                  
-                  <motion.div 
-                    className="absolute z-20"
-                    style={{ 
-                      left: playerPosition.x - CHARACTER_SIZE/2, 
-                      top: playerPosition.y - CHARACTER_SIZE/2,
-                      width: CHARACTER_SIZE,
-                      height: CHARACTER_SIZE
-                    }}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                  >
-                    <motion.div 
-                      className="w-full h-full bg-yellow-500 rounded-sm relative overflow-hidden flex items.center justify-center pixelated"
-                      style={{ 
-                        imageRendering: 'pixelated',
-                        boxShadow: '0 3px 0 rgba(0,0,0,0.3)'
-                      }}
-                      animate={{ y: [0, -2, 0] }}
-                      transition={{ repeat: Infinity, duration: 0.5 }}
-                    >
-                      <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-full h-full relative">
-                          <div className="absolute top-1/4 left-1/3 w-[4px] h-[4px] bg-black rounded-none" />
-                          <div className="absolute top-1/4 right-1/3 w-[4px] h-[4px] bg-black rounded-none" />
-                          <div 
-                            className="absolute top-1/2 left-1/4 w-[12px] h-[4px] bg-black rounded-none"
-                            style={{
-                              transform: 
-                                playerDirection === Direction.UP ? 'translateY(-4px)' : 
-                                playerDirection === Direction.DOWN ? 'translateY(4px)' : 
-                                playerDirection === Direction.LEFT ? 'translateX(-4px) rotate(90deg)' : 
-                                'translateX(4px) rotate(90deg)'
-                            }} 
-                          />
+                <div 
+                  ref={mapRef}
+                  className="absolute origin-top-left transition-transform duration-200"
+                  style={{ 
+                    transform: `scale(${mapScale})`,
+                    left: `${mapPosition.x}px`,
+                    top: `${mapPosition.y}px`,
+                  }}
+                >
+                  <div className="relative">
+                    <img 
+                      src="/lovable-uploads/f55a5bc8-b4e5-446a-9803-84768ce13250.png" 
+                      alt="Village Map" 
+                      className="w-[1000px] h-[1000px] object-cover pixel-art sepia brightness-75"
+                      style={{ imageRendering: 'pixelated' }}
+                    />
+                    
+                    {landmarks.map(landmark => (
+                      <motion.div
+                        key={`landmark-${landmark.id}`}
+                        className="absolute cursor-pointer"
+                        style={{ 
+                          left: landmark.x - 12, 
+                          top: landmark.y - 12,
+                          zIndex: 10
+                        }}
+                        whileHover={{ scale: 1.2 }}
+                        animate={{ 
+                          scale: [1, 1.1, 1],
+                        }}
+                        transition={{ repeat: Infinity, duration: 2 }}
+                        onClick={() => navigateToLandmark(landmark)}
+                      >
+                        <div className="w-[24px] h-[24px] bg-red-500 rounded-full flex items-center justify-center">
+                          <MapPin className="w-4 h-4 text-white" />
                         </div>
-                      </div>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-slate-800/90 text-white text-xs py-1 px-2 rounded mb-1">
+                          {landmark.name}
+                        </div>
+                      </motion.div>
+                    ))}
+                    
+                    {miniGames.map(game => (
+                      <motion.div
+                        key={`game-${game.id}`}
+                        className="absolute cursor-pointer"
+                        style={{ 
+                          left: game.x - 12, 
+                          top: game.y - 12,
+                          zIndex: 10
+                        }}
+                        whileHover={{ scale: 1.2 }}
+                        animate={game.id === 5 ? {
+                          scale: [1, 1.2, 1],
+                          boxShadow: ['0 0 0 0 rgba(255,215,0,0)', '0 0 0 8px rgba(255,215,0,0.3)', '0 0 0 0 rgba(255,215,0,0)']
+                        } : { 
+                          rotate: [0, 10, -10, 0],
+                        }}
+                        transition={{ repeat: Infinity, duration: game.id === 5 ? 1.5 : 3 }}
+                        onClick={() => {
+                          setPlayerPosition({ x: game.x, y: game.y });
+                          setActiveGame(game);
+                          setActiveLandmark(null);
+                        }}
+                      >
+                        <div className={`w-[24px] h-[24px] ${game.id === 5 ? 'bg-yellow-500' : 'bg-purple-500'} rounded-lg flex items-center justify-center`}>
+                          {game.id === 5 ? (
+                            <Waves className="w-4 h-4 text-white" />
+                          ) : (
+                            <Gamepad className="w-4 h-4 text-white" />
+                          )}
+                        </div>
+                        <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 whitespace-nowrap bg-slate-800/90 text-white text-xs py-1 px-2 rounded mb-1">
+                          {game.name}
+                          {game.id === 5 && (
+                            <span className="ml-1 text-yellow-300 text-xs">✨</span>
+                          )}
+                        </div>
+                      </motion.div>
+                    ))}
+                    
+                    <motion.div 
+                      className="absolute z-20"
+                      style={{ 
+                        left: playerPosition.x - CHARACTER_SIZE/2, 
+                        top: playerPosition.y - CHARACTER_SIZE/2,
+                        width: CHARACTER_SIZE,
+                        height: CHARACTER_SIZE
+                      }}
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    >
+                      <motion.div 
+                        className="w-full h-full bg-yellow-500 rounded-sm relative overflow-hidden flex items.center justify-center pixelated"
+                        style={{ 
+                          imageRendering: 'pixelated',
+                          boxShadow: '0 3px 0 rgba(0,0,0,0.3)'
+                        }}
+                        animate={{ y: [0, -2, 0] }}
+                        transition={{ repeat: Infinity, duration: 0.5 }}
+                      >
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="w-full h-full relative">
+                            <div className="absolute top-1/4 left-1/3 w-[4px] h-[4px] bg-black rounded-none" />
+                            <div className="absolute top-1/4 right-1/3 w-[4px] h-[4px] bg-black rounded-none" />
+                            <div 
+                              className="absolute top-1/2 left-1/4 w-[12px] h-[4px] bg-black rounded-none"
+                              style={{
+                                transform: 
+                                  playerDirection === Direction.UP ? 'translateY(-4px)' : 
+                                  playerDirection === Direction.DOWN ? 'translateY(4px)' : 
+                                  playerDirection === Direction.LEFT ? 'translateX(-4px) rotate(90deg)' : 
+                                  'translateX(4px) rotate(90deg)'
+                              }} 
+                            />
+                          </div>
+                        </div>
+                      </motion.div>
                     </motion.div>
-                  </motion.div>
+                  </div>
                 </div>
+                
+                <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-slate-900/30" />
               </div>
-              
-              <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-transparent to-slate-900/30" />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      <AnimatePresence>
-        {activeLandmark && !playingGame && (
-          <motion.div 
-            key={`landmark-${activeLandmark.id}`}
-            className="mt-4 bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg text-white"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            <div className="flex flex-col md:flex-row items-start gap-4">
-              {activeLandmark.image && (
-                <motion.img 
-                  src={activeLandmark.image} 
-                  alt={activeLandmark.name} 
-                  className="w-full md:w-40 h-32 object-cover rounded-lg"
-                  initial={{ scale: 0.95, opacity: 0.8 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              )}
-              <div>
-                <motion.h3 
-                  className="text-xl font-bold mb-1 flex items-center gap-2"
-                  initial={{ x: -10, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
-                >
-                  <MapPin className="h-5 w-5 text-red-500" />
-                  {activeLandmark.name}
-                </motion.h3>
-                <motion.p 
-                  className="text-gray-300"
-                  initial={{ x: -10, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  {activeLandmark.description}
-                </motion.p>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      <AnimatePresence>
-        {activeGame && !playingGame && (
-          <motion.div 
-            key={`game-${activeGame.id}`}
-            className="mt-4 bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg text-white"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 20 }}
-            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-          >
-            <div className="flex items-start gap-3">
+            </motion.div>
+          )}
+        </AnimatePresence>
+        
+        {/* Information Panel - Now displayed below the map */}
+        <div className="mt-4">
+          <AnimatePresence>
+            {activeLandmark && !playingGame && (
               <motion.div 
-                className="bg-purple-500 rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0"
-                initial={{ rotate: -10, scale: 0.9 }}
-                animate={{ rotate: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 200 }}
+                key={`landmark-${activeLandmark.id}`}
+                className="bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
-                <Gamepad className="h-5 w-5 text-white" />
+                <div className="flex flex-col sm:flex-row items-start gap-4">
+                  {activeLandmark.image && (
+                    <motion.img 
+                      src={activeLandmark.image} 
+                      alt={activeLandmark.name} 
+                      className="w-full sm:w-40 h-32 object-cover rounded-lg"
+                      initial={{ scale: 0.95, opacity: 0.8 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
+                  <div>
+                    <motion.h3 
+                      className="text-xl font-bold mb-1 flex items-center gap-2"
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <MapPin className="h-5 w-5 text-red-500" />
+                      {activeLandmark.name}
+                    </motion.h3>
+                    <motion.p 
+                      className="text-gray-300"
+                      initial={{ x: -10, opacity: 0 }}
+                      animate={{ x: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      {activeLandmark.description}
+                    </motion.p>
+                  </div>
+                </div>
               </motion.div>
-              <div>
-                <motion.h3 
-                  className="text-xl font-bold mb-1"
-                  initial={{ y: -5, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.1 }}
+            )}
+          </AnimatePresence>
+          
+          <AnimatePresence>
+            {activeGame && !playingGame && (
+              <motion.div 
+                key={`game-${activeGame.id}`}
+                className="mt-4 bg-slate-800/90 backdrop-blur-sm p-4 rounded-lg text-white"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 20 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                <div className="flex items-start gap-3">
+                  <motion.div 
+                    className={`${activeGame.id === 5 ? 'bg-yellow-500' : 'bg-purple-500'} rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0`}
+                    initial={{ rotate: -10, scale: 0.9 }}
+                    animate={{ rotate: 0, scale: 1 }}
+                    transition={{ type: "spring", stiffness: 200 }}
+                  >
+                    {activeGame.id === 5 ? (
+                      <Waves className="h-5 w-5 text-white" />
+                    ) : (
+                      <Gamepad className="h-5 w-5 text-white" />
+                    )}
+                  </motion.div>
+                  <div>
+                    <motion.h3 
+                      className="text-xl font-bold mb-1"
+                      initial={{ y: -5, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      {activeGame.name}
+                    </motion.h3>
+                    <motion.p 
+                      className="text-gray-300 mb-3"
+                      initial={{ y: -5, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.2 }}
+                    >
+                      {activeGame.description}
+                    </motion.p>
+                    <motion.div
+                      initial={{ scale: 0.9, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ delay: 0.3 }}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Button 
+                        onClick={startGame} 
+                        className={`${activeGame.id === 5 ? 'bg-yellow-600 hover:bg-yellow-700' : 'bg-purple-600 hover:bg-purple-700'}`}
+                      >
+                        Play Game
+                      </Button>
+                    </motion.div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+        
+        {!playingGame && (
+          <motion.div 
+            className="mt-4 bg-slate-800/80 p-3 rounded-lg"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+            <h3 className="text-white text-sm font-semibold mb-2 flex items-center">
+              Quick Travel
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {landmarks.map(landmark => (
+                <Button 
+                  key={landmark.id} 
+                  size="sm" 
+                  variant="outline" 
+                  className="text-xs"
+                  onClick={() => navigateToLandmark(landmark)}
                 >
-                  {activeGame.name}
-                </motion.h3>
-                <motion.p 
-                  className="text-gray-300 mb-3"
-                  initial={{ y: -5, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  transition={{ delay: 0.2 }}
-                >
-                  {activeGame.description}
-                </motion.p>
-                <motion.div
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.3 }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  <Button onClick={startGame} className="bg-purple-600 hover:bg-purple-700">
-                    Start Game
-                  </Button>
-                </motion.div>
-              </div>
+                  <MapPin className="h-3 w-3 mr-1" /> {landmark.name}
+                </Button>
+              ))}
             </div>
           </motion.div>
         )}
-      </AnimatePresence>
-      
-      {!playingGame && (
-        <motion.div 
-          className="mt-4 bg-slate-800/80 p-3 rounded-lg"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          <h3 className="text-white text-sm font-semibold mb-2 flex items-center">
-            Quick Travel
-          </h3>
-          <div className="flex flex-wrap gap-2">
-            {landmarks.map(landmark => (
-              <Button 
-                key={landmark.id} 
-                size="sm" 
-                variant="outline" 
-                className="text-xs"
-                onClick={() => navigateToLandmark(landmark)}
-              >
-                <MapPin className="h-3 w-3 mr-1" /> {landmark.name}
-              </Button>
-            ))}
-          </div>
-        </motion.div>
-      )}
-      
-      {!playingGame && renderControls()}
-      
-      <style>{`
-        .pixel-art {
-          image-rendering: pixelated;
-          image-rendering: -moz-crisp-edges;
-          image-rendering: crisp-edges;
-        }
-      `}</style>
+        
+        {!playingGame && renderControls()}
+        
+        <style>{`
+          .pixel-art {
+            image-rendering: pixelated;
+            image-rendering: -moz-crisp-edges;
+            image-rendering: crisp-edges;
+          }
+          .sepia {
+            filter: sepia(0.5);
+          }
+        `}</style>
+      </div>
     </div>
   );
 };

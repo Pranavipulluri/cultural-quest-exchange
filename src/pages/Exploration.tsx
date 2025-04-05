@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import KeralaItinerary from "@/components/KeralaItinerary";
 import { 
   Globe, Compass, Calendar, 
   Map as MapIcon, Info, X,
-  Users
+  Users, Waves
 } from "lucide-react";
 
 const Exploration = () => {
@@ -140,6 +139,92 @@ const Exploration = () => {
                     </div>
                   </CardContent>
                 </Card>
+              </motion.div>
+              
+              {/* Featured Experiences */}
+              <motion.div
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+                className="mb-8"
+              >
+                <h2 className="text-xl font-bold text-white mb-4 flex items-center">
+                  <Calendar className="h-5 w-5 text-teal-400 mr-2" />
+                  Featured Cultural Experiences
+                </h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* Onam Boat Race Card */}
+                  <motion.div 
+                    whileHover={{ y: -5 }} 
+                    className="rounded-xl overflow-hidden"
+                  >
+                    <Card className="bg-gradient-to-br from-yellow-900/40 to-slate-800/80 border-yellow-500/30 h-full">
+                      <CardContent className="p-0">
+                        <div className="relative h-48 overflow-hidden">
+                          <img 
+                            src="/lovable-uploads/ca2d6830-e22c-4607-b372-bf96d604334a.png" 
+                            alt="Onam Boat Race" 
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
+                          <div className="absolute bottom-0 left-0 w-full p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-xl font-bold text-white flex items-center">
+                                  <Waves className="h-5 w-5 text-yellow-400 mr-2" />
+                                  Onam Boat Race
+                                </h3>
+                                <p className="text-gray-300 text-sm">Traditional Kerala festival race</p>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                className="bg-yellow-600 hover:bg-yellow-700"
+                                onClick={() => setShowItinerary(true)}
+                              >
+                                Experience
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                  
+                  {/* Other cultural experience card */}
+                  <motion.div 
+                    whileHover={{ y: -5 }} 
+                    className="rounded-xl overflow-hidden"
+                  >
+                    <Card className="bg-gradient-to-br from-purple-900/40 to-slate-800/80 border-purple-500/30 h-full">
+                      <CardContent className="p-0">
+                        <div className="relative h-48 overflow-hidden">
+                          <img 
+                            src="/lovable-uploads/91bf8199-59a4-4e3e-96c1-10cd41b289f1.png" 
+                            alt="Kathakali Dance" 
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent"></div>
+                          <div className="absolute bottom-0 left-0 w-full p-4">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <h3 className="text-xl font-bold text-white">Kathakali Dance</h3>
+                                <p className="text-gray-300 text-sm">Classical Kerala dance-drama</p>
+                              </div>
+                              <Button 
+                                size="sm" 
+                                className="bg-purple-600 hover:bg-purple-700"
+                                onClick={() => {}}
+                              >
+                                Coming Soon
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                </div>
               </motion.div>
               
               {/* Cultural Events Calendar - This is kept as a simpler component to focus on the map */}
