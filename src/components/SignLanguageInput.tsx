@@ -2,7 +2,7 @@
 import React, { useRef, useState } from 'react';
 import { Camera, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { pipeline } from "@huggingface/transformers";
 
 export interface SignLanguageInputProps {
@@ -67,16 +67,18 @@ export function SignLanguageInput({ onMessageSubmit }: SignLanguageInputProps) {
       // Initialize the image classification pipeline
       const classifier = await pipeline(
         "image-classification",
-        "sign-language-model/asl-signs",
-        { quantized: true }
+        "sign-language-model/asl-signs"
       );
 
       // Process the image
       const results = await classifier(imageBlob);
       
-      if (results && results[0]) {
-        const detectedSign = results[0].label;
+      if (results && Array.isArray(results) && results[0] && results[0].score !== undefined) {
+        // Access the first result which should have the highest score
+        const detectedSign = results[0].label || "Unknown sign";
         onMessageSubmit(detectedSign);
+      } else {
+        console.error('Unexpected result format:', results);
       }
 
       stopWebcam();
