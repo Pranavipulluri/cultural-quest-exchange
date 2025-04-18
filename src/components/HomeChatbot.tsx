@@ -1,12 +1,11 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { MessageCircle, Send, Camera, X } from 'lucide-react';
+import { MessageCircle, Send, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useToast } from '@/hooks/use-toast';
 import { SignLanguageInput } from './SignLanguageInput';
 
@@ -100,6 +99,10 @@ export default function HomeChatbot() {
     e.preventDefault();
     handleSendMessage();
   };
+
+  const handleSignLanguageDetection = (text: string) => {
+    setInputValue(text);
+  };
   
   return (
     <>
@@ -171,11 +174,8 @@ export default function HomeChatbot() {
               <SignLanguageInput 
                 onMessageSubmit={(text) => {
                   handleSendMessage(text);
-                  toast({
-                    title: "Sign Language Detected",
-                    description: "Your signed message has been sent!",
-                  });
                 }}
+                onTextDetected={handleSignLanguageDetection}
               />
               <Button type="submit" size="icon" disabled={!inputValue.trim()}>
                 <Send className="h-4 w-4" />

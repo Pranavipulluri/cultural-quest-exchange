@@ -108,6 +108,10 @@ const Chat = () => {
     }
   };
   
+  const handleSignLanguageDetection = (text: string) => {
+    setInputValue(text);
+  };
+  
   return (
     <PageLayout>
       <div className="container mx-auto py-6">
@@ -374,6 +378,7 @@ const Chat = () => {
                             setInputValue(text);
                             sendMessage(text);
                           }}
+                          onTextDetected={handleSignLanguageDetection}
                         />
                         <Button type="submit" disabled={!inputValue.trim()}>
                           <Send className="h-4 w-4 mr-2" />
