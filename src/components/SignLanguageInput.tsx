@@ -73,10 +73,17 @@ export function SignLanguageInput({ onMessageSubmit }: SignLanguageInputProps) {
       // Process the image
       const results = await classifier(imageBlob);
       
-      if (results && Array.isArray(results) && results[0] && results[0].score !== undefined) {
-        // Access the first result which should have the highest score
-        const detectedSign = results[0].label || "Unknown sign";
-        onMessageSubmit(detectedSign);
+      // Check for valid results and handle properly based on the actual structure
+      if (results && Array.isArray(results) && results.length > 0) {
+        // Access the first result
+        const firstResult = results[0];
+        // Use optional chaining and type checks to safely access properties
+        const detectedSign = typeof firstResult === 'object' && 
+                            firstResult !== null && 
+                            'label' in firstResult ? 
+                            firstResult.label : "Unknown sign";
+        
+        onMessageSubmit(detectedSign as string);
       } else {
         console.error('Unexpected result format:', results);
       }
