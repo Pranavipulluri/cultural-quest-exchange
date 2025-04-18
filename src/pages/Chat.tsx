@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import { useChat } from '@/hooks/useChat';
 import { ChatContact, ChatGroup, MessageWithSender } from '@/types/supabase-extensions';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { useToast } from '@/hooks/use-toast';
+import { SignLanguageInput } from '@/components/SignLanguageInput';
 
 const Chat = () => {
   const { user, isDemoMode } = useAuth();
@@ -368,6 +368,12 @@ const Chat = () => {
                           value={inputValue}
                           onChange={(e) => setInputValue(e.target.value)}
                           className="flex-1"
+                        />
+                        <SignLanguageInput 
+                          onMessageSubmit={(text) => {
+                            setInputValue(text);
+                            sendMessage(text);
+                          }}
                         />
                         <Button type="submit" disabled={!inputValue.trim()}>
                           <Send className="h-4 w-4 mr-2" />
