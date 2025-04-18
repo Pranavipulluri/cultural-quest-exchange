@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 import { Globe, Users, ShoppingBag, GraduationCap, Gamepad, MessageCircle, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -10,6 +9,7 @@ import AnimatedCharacter from "@/components/AnimatedCharacter";
 import SoundToggle from "@/components/SoundToggle";
 import SoundButton from "@/components/SoundButton";
 import { soundManager } from "@/utils/soundUtils";
+import HomeChatbot from "@/components/HomeChatbot";
 
 const Index = () => {
   const globeRef = useRef<HTMLDivElement>(null);
@@ -198,6 +198,8 @@ const Index = () => {
           </div>
         </div>
       </section>
+      
+      <HomeChatbot />
     </div>
   );
 };
