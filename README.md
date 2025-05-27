@@ -25,20 +25,16 @@
 1. Clone the repository:  
    ```bash
    git clone https://github.com/Pranavipulluri/hackfiniti.git
-   
-2. Navigate to the project directory:
-  ```bash
-  cd hackfiniti
-```
-3. Install dependencies:
+
+2. Install dependencies:
   ```bash
   npm install
 ```
-4. Start the development server:
+3. Start the development server:
   ```bash
-  npm start
+  npm run dev
 ```
-5. Open your browser and go to http://localhost:3000 to see CultQuest in action.
+4. Open your browser and go to http://localhost:3000 to see CultQuest in action.
 
 ##Contribution
 We welcome contributions! Feel free to open issues, submit pull requests, or suggest new features.
